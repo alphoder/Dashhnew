@@ -190,10 +190,14 @@ export default function FrontPage() {
   );
 }
 
-function CombineIcon(props: any) {
+interface IconProps {
+  className?: string;
+}
+
+function CombineIcon({ className }: IconProps) {
   return (
     <svg
-      {...props}
+      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -214,10 +218,10 @@ function CombineIcon(props: any) {
   );
 }
 
-function InboxIcon(props: any) {
+function InboxIcon({ className }: IconProps) {
   return (
     <svg
-      {...props}
+      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -234,10 +238,10 @@ function InboxIcon(props: any) {
   );
 }
 
-function LockIcon(props: any) {
+function LockIcon({ className }: IconProps) {
   return (
     <svg
-      {...props}
+      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -254,10 +258,10 @@ function LockIcon(props: any) {
   );
 }
 
-function MergeIcon(props: any) {
+function MergeIcon({ className }: IconProps) {
   return (
     <svg
-      {...props}
+      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -275,10 +279,10 @@ function MergeIcon(props: any) {
   );
 }
 
-function SearchIcon(props: any) {
+function SearchIcon({ className }: IconProps) {
   return (
     <svg
-      {...props}
+      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -295,10 +299,10 @@ function SearchIcon(props: any) {
   );
 }
 
-function SettingsIcon(props: any) {
+function SettingsIcon({ className }: IconProps) {
   return (
     <svg
-      {...props}
+      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
