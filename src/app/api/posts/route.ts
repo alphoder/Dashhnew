@@ -29,7 +29,7 @@ function runMiddleware(req:Request, res:Response, fn: any) {
 await connectDB();
     try {
         const data = await req.json();
-      
+
 
       const newPost = new Creator({
         solAdd: data.solAdd,
@@ -46,7 +46,8 @@ await connectDB();
       console.log(newPost);
       return Response.json({ message: 'Post created successfully', data: newPost });
     } catch (error) {
-        return Response.json({ message: 'Internal Server Error', error });
+        console.error('Error creating post:', error);
+        return Response.json({ message: 'Internal Server Error', error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
     }
 }
 
@@ -61,6 +62,7 @@ export const PUT = async(req: Request, res:Response)=> {
         const updatedPost = await User.findByIdAndUpdate(id, { igProfile, views }, { new: true });
         console.log(updatedPost);
         return Response.json({ message: 'Post updated successfully', data: updatedPost }); } catch (error) {
-        return Response.json({ message: 'Internal Server Error', error });
+        console.error('Error updating post:', error);
+        return Response.json({ message: 'Internal Server Error', error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
     }
 }
