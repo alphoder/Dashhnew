@@ -24,14 +24,14 @@ const Header = () => {
     const [walletAddress, setWalletAddress] = useState<string | null>(null);
     return (
       
-            <nav className="fixed top-0 left-0 w-full z-10 bg-[#62626235] backdrop-blur-xl">
+            <nav className="fixed top-0 left-0 w-full z-10 bg-[#62626235] backdrop-blur-xl" aria-label="Main navigation">
                 <div className="flex p-4 my-2 md:gap-32 lg:gap-64 justify-between items-center  h-16">
                     <div className=" flex items-center justify-center sm:items-stretch sm:justify-start">
                         {/* logo thinggg */}
                         <div className="flex-shrink-0 flex items-center pl-4 lg:pl-6 ">
-                            <Link href="/">
-                                <Image className="block lg:hidden h-16 w-auto" src={logo} alt="Workflow" width={64} height={64} />
-                                <Image className="hidden lg:block h-16  w-auto" src={logo} alt="Workflow" width={64} height={64} />
+                            <Link href="/" aria-label="Home">
+                                <Image className="block lg:hidden h-16 w-auto" src={logo} alt="DASHH Logo" width={64} height={64} />
+                                <Image className="hidden lg:block h-16  w-auto" src={logo} alt="DASHH Logo" width={64} height={64} />
                             </Link>
                         </div>
                         {/* Toggle thingg */}
