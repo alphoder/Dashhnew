@@ -54,7 +54,7 @@ export function TeamSpotlight() {
         <div className="mb-12 text-center">
           <h2 className="h-main tracking-tighter text-white lg:text-5xl">
             In the spotlight –&nbsp;
-            <span className="bg-gradient-to-r from-[#ff9a9e] via-[#ff6b95] to-[#a855f7] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#9945FF] via-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
               DASHH's brightest stars
             </span>
           </h2>
@@ -72,7 +72,7 @@ export function TeamSpotlight() {
                 onClick={() => setSelectedMember(member)}
                 className={`group relative w-full rounded-xl p-4 text-left transition-all ${
                   selectedMember.id === member.id
-                    ? "bg-gradient-to-r from-[#ff9a9e] via-[#ff6b95] to-[#a855f7]"
+                    ? "bg-gradient-to-r from-[#9945FF] via-[#9945FF] to-[#14F195]"
                     : "bg-zinc-900 hover:bg-zinc-800"
                 }`}
               >
@@ -117,7 +117,7 @@ export function TeamSpotlight() {
           <div className="space-y-6">
             {selectedMember.description.map((paragraph, index) => (
               <div key={index} className="flex gap-4">
-                <div className="h-2 w-2 mt-2 rounded-full bg-gradient-to-r from-[#ff9a9e] to-[#a855f7]" />
+                <div className="h-2 w-2 mt-2 rounded-full bg-gradient-to-r from-[#9945FF] to-[#14F195]" />
                 <p className="text-gray-300">{paragraph}</p>
               </div>
             ))}

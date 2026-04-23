@@ -1,36 +1,57 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
 body {
-  font-family: "Lato", Helvetica, sans-serif;
-  letter-spacing: 0.1rem;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Helvetica, sans-serif;
+  letter-spacing: -0.005em;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
 @layer base {
-  :root {
-    --radius: 0.5rem;
+  :root { --radius: 0.5rem; }
+
+  /* Display — hero H1 */
+  h1 {
+    font-family: "Space Grotesk", "Inter", sans-serif;
+    letter-spacing: -0.025em;
+  }
+  h2, h3, h4 {
+    font-family: "Inter", sans-serif;
+    letter-spacing: -0.015em;
+  }
+  /* Calmer, crisper small text */
+  p { line-height: 1.6; }
+  code, pre { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+
+  /* Solana Native gradient — Solana purple → neon mint */
+  .text-gd {
+    @apply bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent;
+  }
+  .bg-gd {
+    @apply bg-gradient-to-r from-[#9945FF] to-[#14F195];
+  }
+  .bg-gd-hover:hover { filter: brightness(1.1); }
+
+  /* Typography scale — apply these instead of hand-rolling sizes */
+  .h-display { @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]; }
+  .h-main    { @apply text-3xl md:text-4xl font-bold tracking-tight leading-[1.1]; }
+  .h-section { @apply text-2xl md:text-3xl font-semibold tracking-tight; }
+  .h-card    { @apply text-lg md:text-xl font-semibold; }
+  .eyebrow   { @apply text-[11px] md:text-xs font-semibold uppercase tracking-[0.15em]; }
+  .body      { @apply text-sm md:text-base text-zinc-300 leading-relaxed; }
+  .body-muted{ @apply text-sm text-zinc-400 leading-relaxed; }
+  .caption   { @apply text-xs text-zinc-500; }
+
+  .text-mono {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500;
+  }
+  .text-normal {
+    @apply text-zinc-200 text-sm md:text-base dark:text-zinc-100;
   }
 }
-
-.text-gd{
-  @apply bg-gradient-to-r from-[#ff9a9e] via-[#ff6b95] to-[#a855f7] bg-clip-text text-transparent
-}
-
-.h-main{
- @apply text-3xl font-bold  sm:text-3xl xl:text-[2.35rem]/none 
-}
-.text-mono{
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500 
-}
-.text-normal{
-  @apply text-zinc-200 text-sm md:text-lg dark:text-zinc-100
-}
-

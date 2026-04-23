@@ -1,64 +1,85 @@
-'use client'
+'use client';
 
-import { useState } from "react"
-import ConnectPhantomWallet from "@/app/connectPhantomWallet/connectbtn"
-import CustomToggle from "./custom-toggle"
-import Link from "next/link"
-import Image from "next/image"
-import logo from "../images/whiteDASHH.png"
-import { useRouter } from "next/navigation"
-
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import ConnectPhantomWallet from '@/app/connectPhantomWallet/connectbtn';
+import { NotificationBell } from './notification-bell';
+import { RoleToggle } from './role-toggle';
+import { PrimaryCTA } from './primary-cta';
+import logo from '../images/whiteDASHH.png';
+import { isAppRoute } from '@/lib/modes';
 
 const Header = () => {
-    const [selectedOption, setSelectedOption] = useState('');
-    const router = useRouter()
-    const handleToggle = (selected: string) => {
-        setSelectedOption(selected);
-      };
-      if(selectedOption === 'User'){
-        router.push('/dashboard')
-      }
-      else if(selectedOption === 'Creator'){
-        router.push('/creatordashboard')
-      }
-    const [walletAddress, setWalletAddress] = useState<string | null>(null);
-    return (
-      
-            <nav className="fixed top-0 left-0 w-full z-10 bg-[#62626235] backdrop-blur-xl" aria-label="Main navigation">
-                <div className="flex p-4 my-2 md:gap-32 lg:gap-64 justify-between items-center  h-16">
-                    <div className=" flex items-center justify-center sm:items-stretch sm:justify-start">
-                        {/* logo thinggg */}
-                        <div className="flex-shrink-0 flex items-center pl-4 lg:pl-6 ">
-                            <Link href="/" aria-label="Home">
-                                <Image className="block lg:hidden h-16 w-auto" src={logo} alt="DASHH Logo" width={64} height={64} />
-                                <Image className="hidden lg:block h-16  w-auto" src={logo} alt="DASHH Logo" width={64} height={64} />
-                            </Link>
-                        </div>
-                        {/* Toggle thingg */}
-                    </div>
-                    <div className={`hidden sm:${walletAddress ? "flex" : "hidden" } pl-28 justify-center items-center`}>
-                        <div className=" flex justify-center items-center">
-                            <CustomToggle options={["User", "Creator"]}onChange={handleToggle}/>
-                        </div>
-                    </div>
-                    <div className="flex flex-col-reverse justify-center items-center sm:flex sm:flex-row gap-2 right-0">
-                    <ConnectPhantomWallet walletAddress={walletAddress} setWalletAddress={setWalletAddress} />
-                    </div>
-                    {/* <div className="absolute inset-y-0 right-0 flex items-center sm:hidden">
-                            <button type="button" className="bg-gray-900 inline-flex items-center justify-center p-2 rounded-md text-white hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                                <span className="sr-only">Open main menu</span>
-                                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                                <svg className="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div> */}
-                </div>
-            </nav>
-       
-    )
-}
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const pathname = usePathname();
+  const inApp = isAppRoute(pathname);
 
-export default Header
+  useEffect(() => {
+    if (walletAddress) {
+      window.localStorage.setItem('dashh_wallet', walletAddress);
+    }
+  }, [walletAddress]);
+
+  useEffect(() => {
+    const stored =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem('dashh_wallet')
+        : null;
+    if (stored && !walletAddress) setWalletAddress(stored);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <nav
+      className="fixed top-0 left-0 w-full z-30 bg-black/60 backdrop-blur-xl border-b border-white/5"
+      aria-label="Main navigation"
+    >
+      <div className="flex h-16 items-center gap-4 px-4 md:px-6">
+        {/* Logo */}
+        <div className="flex-shrink-0">
+          <Link href="/" aria-label="Home" className="inline-flex items-center">
+            <Image
+              src={logo}
+              alt="DASHH"
+              width={48}
+              height={48}
+              className="h-12 w-auto"
+            />
+          </Link>
+        </div>
+
+        {/* Centre slot — RoleToggle on app pages only; blank on public pages */}
+        <div className="hidden sm:flex flex-1 justify-center">
+          {inApp && <RoleToggle />}
+        </div>
+
+        {/* Right cluster */}
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/how-it-works"
+            className="hidden md:inline-flex items-center rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition"
+          >
+            How it works
+          </Link>
+          <PrimaryCTA variant="ghost" />
+          <NotificationBell wallet={walletAddress} />
+          <ConnectPhantomWallet
+            walletAddress={walletAddress}
+            setWalletAddress={setWalletAddress}
+          />
+        </div>
+      </div>
+
+      {/* Mobile centre row (below) — RoleToggle only on app pages */}
+      {inApp && (
+        <div className="flex sm:hidden justify-center pb-3">
+          <RoleToggle />
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default Header;

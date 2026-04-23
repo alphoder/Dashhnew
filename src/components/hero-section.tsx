@@ -4,14 +4,13 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { PrimaryCTA } from "@/components/primary-cta";
 import blockchainlogo from "@/images/blockchain.png";
 import solanalogo from "@/images/solana.png";
 import gamelogo from "@/images/game.png";
 import weblogo from "@/images/web.png";
 import reclaimlogo from "@/images/reclaim.png";
 import logo from "../images/whiteDASHH.png";
-import { AnimatedShinyText } from "./magicui/ShiningText";
-import { cn } from "@/lib/utils";
 const demoImages = [
   {
     src: blockchainlogo,
@@ -41,11 +40,11 @@ export function HeroSection() {
       <div className="container relative h-full items-center flex  justify-center mx-auto px-4 py-24 lg:px-8">
         <div className="grid gap-12  lg:grid-cols-2 lg:gap-8">
           <div className="flex   h-full mt-36 z-10 md:mt-0 text-center md:text-left flex-col justify-center space-y-12 items-center md:items-start md:space-y-20">
-            <h1 className="text-3xl font-bold  sm:text-3xl xl:text-[3rem]/none  tracking-tighter leading-tight sm:leading-none">
-              <span className="bg-gradient-to-r relative  from-[#ff9a9e] to-[#ff6b95] bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
+              <span className="bg-gradient-to-r relative  from-[#9945FF] to-[#9945FF] bg-clip-text text-transparent">
                 Decentralized&nbsp;
               </span>
-              <span className="bg-gradient-to-r from-[#ff6b95] to-[#a855f7] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
                 Marketing&nbsp;
               </span>
 
@@ -53,7 +52,7 @@ export function HeroSection() {
               <span className="text-white">for a Global Audience</span>
             </h1>
             <div className="space-y-4">
-              <p className="text-lg text-center md:text-left text-normal text-gray-300">
+              <p className="text-base md:text-lg text-center md:text-left text-zinc-300 leading-relaxed">
                 DASHH is revolutionizing advertising by connecting brands with
                 top-tier micro-influencers around the world. Our decentralized
                 platform ensures that every influencer is fairly rewarded for
@@ -69,11 +68,11 @@ export function HeroSection() {
                   key={index}
                   className={`-z-10 absolute h-[300px] w-[300px] rounded-full ${
                     index % 2 === 0
-                      ? "bg-[#ff9a9e]"
+                      ? "bg-[#9945FF]"
                       : index == 3
                       ? "bg-[#ff4a7d]"
-                      : "bg-[#a855f7]"
-                  } from-[#ff9a9e] via-[#ff6b95] to-[#a855f7] blur-[80px] opacity-30`}
+                      : "bg-[#14F195]"
+                  } from-[#9945FF] via-[#9945FF] to-[#14F195] blur-[80px] opacity-30`}
                   initial={{
                     x: Math.random() * window.innerWidth,
                     y: Math.random() * window.innerHeight,
@@ -92,13 +91,7 @@ export function HeroSection() {
               ))}
             </div> */}
             <div>
-              <Button
-                className="bg-gradient-to-r from-[#ff9a9e] to-[#a855f7] text-white hover:from-[#ff8a8e] hover:to-[#9645e6]"
-                size="lg"
-                asChild
-              >
-                <Link href="#">Connect Us</Link>
-              </Button>
+              <PrimaryCTA variant="hero" />
             </div>
           </div>
 
@@ -160,7 +153,7 @@ export function HeroSection() {
                     ease: "linear",
                   }}
                 >
-                  <div className="relative h-16 w-16 rounded-full bg-gradient-to-r from-[#ff9a9e] via-[#ff6b95] to-[#a855f7] p-[2px]">
+                  <div className="relative h-16 w-16 rounded-full bg-gradient-to-r from-[#9945FF] via-[#9945FF] to-[#14F195] p-[2px]">
                     <Image
                       src={logo}
                       alt="Team member"
