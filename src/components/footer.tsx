@@ -83,7 +83,7 @@ export default function Footer() {
         <div className="flex flex-col-reverse gap-6 md:flex-row md:items-center md:justify-between pt-8 border-t border-white/10">
           <div>
             <p className="text-sm text-zinc-400">
-              © 2025 DASHH · All rights reserved
+              © 2026 DASHH · All rights reserved
             </p>
             <p className="text-xs text-zinc-600 mt-1">
               Illustrative figures. Not financial advice.
