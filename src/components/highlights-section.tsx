@@ -100,7 +100,12 @@ export function HighlightsSection() {
                 directly with influencers, emphasizing transparency, trust, and
                 the power of on-chain engagement verification.
               </p>
-              <Link href="#" className="text-pink-400 hover:text-pink-300">
+              <Link
+                href="https://www.forbes.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#14F195] hover:text-[#14F195]"
+              >
                 Read the article →
               </Link>
             </div>
@@ -174,10 +179,15 @@ export function HighlightsSection() {
                 </div>
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold">
-                    How to build a powerful marketing department in 2024
+                    How to build a powerful marketing department in 2025
                   </h3>
-                  <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600">
-                    Get the Blueprint
+                  <Button
+                    onClick={() => {
+                      window.open("/onboarding", "_self");
+                    }}
+                    className="w-full bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white hover:opacity-90"
+                  >
+                    Get Started
                   </Button>
                 </div>
               </CardContent>

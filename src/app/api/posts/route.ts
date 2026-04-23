@@ -1,68 +1,48 @@
+import { db } from '@/lib/db';
+import { creators, users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
-// import { NextApiRequest, NextApiResponse } from 'next';
-import connectDB from '@/lib/dbconnect';
-import Creator from '@/lib/models/creater';
-import User from '@/lib/models/user';
-// import { ICreator } from '@/lib/interface/creater';
-import Cors from 'cors';
+export const POST = async (req: Request) => {
+  try {
+    const data = await req.json();
 
-// Initializing the cors middleware
-const cors = Cors({
-  methods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
-  origin: '*', // Replace '' with your frontend domain in production
-});
+    const [newPost] = await db.insert(creators).values({
+      solAdd: data.solAdd,
+      title: data.title,
+      description: data.description,
+      label: data.label,
+      amount: data.amount,
+      icons: data.icons,
+      end: new Date(data.end),
+      users: [],
+    }).returning();
 
-// Helper method to wait for middleware to execute before continuing
-function runMiddleware(req:Request, res:Response, fn: any) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result: any) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
-    });
-  });
-}
+    return Response.json({ message: 'Post created successfully', data: newPost });
+  } catch (error) {
+    console.error('Error creating post:', error);
+    return Response.json(
+      { message: 'Internal Server Error', error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
+  }
+};
 
+export const PUT = async (req: Request) => {
+  try {
+    const data = await req.json();
+    const { id, igProfile, views } = data;
 
-  export const POST = async(req: Request)=> {
-await connectDB();
-    try {
-        const data = await req.json();
+    const [updatedPost] = await db.update(users)
+      .set({ igProfile, views })
+      .where(eq(users.id, id))
+      .returning();
 
-
-      const newPost = new Creator({
-        solAdd: data.solAdd,
-        title: data.title,
-        description: data.description,
-        label: data.label,
-        amount: data.amount,
-        icons: data.icons,
-        end: data.end,
-        users: [],
-      });
-
-      await newPost.save();
-      console.log(newPost);
-      return Response.json({ message: 'Post created successfully', data: newPost });
-    } catch (error) {
-        console.error('Error creating post:', error);
-        return Response.json({ message: 'Internal Server Error', error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
-    }
-}
-
-export const PUT = async(req: Request, res:Response)=> {
-    await connectDB();
-    await runMiddleware(req, res, cors);
-    try {
-        const data = await req.json();
-        console.log(data);
-        const { id, igProfile, views } = data;
-
-        const updatedPost = await User.findByIdAndUpdate(id, { igProfile, views }, { new: true });
-        console.log(updatedPost);
-        return Response.json({ message: 'Post updated successfully', data: updatedPost }); } catch (error) {
-        console.error('Error updating post:', error);
-        return Response.json({ message: 'Internal Server Error', error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
-    }
-}
+    return Response.json({ message: 'Post updated successfully', data: updatedPost });
+  } catch (error) {
+    console.error('Error updating post:', error);
+    return Response.json(
+      { message: 'Internal Server Error', error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
+  }
+};

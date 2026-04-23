@@ -5,9 +5,8 @@ import {
   ACTIONS_CORS_HEADERS,
   createActionHeaders,
 } from "@solana/actions";
-import connectDB from "@/lib/dbconnect";
-import Creator from "@/lib/models/creater";
-// import User from "@/lib/models/user";
+import { db } from "@/lib/db";
+import { creators } from "@/lib/db/schema";
 
 import {
   clusterApiUrl,
@@ -70,12 +69,11 @@ export async function GET(request: Request) {
               type: "date",
               required: true,
             },
-
             {
-              name: "amount", // input field name
+              name: "amount",
               label: "Prize Pool",
-              type: "number", // input field type
-              required: true, // text input placeholder
+              type: "number",
+              required: true,
             },
           ],
         },
@@ -89,14 +87,12 @@ export async function GET(request: Request) {
 }
 
 export const OPTIONS = async () => Response.json(null, { headers });
+
 export async function POST(request: Request) {
-  await connectDB();
   const body: ActionPostRequest = await request.json();
   const url = new URL(request.url);
   const amount = Number(url.searchParams.get("amount"));
-  console.log(amount);
   let sender;
-  // let camurl;
   let payload: ActionPostResponse;
   try {
     sender = new PublicKey(body.account);
@@ -106,7 +102,7 @@ export async function POST(request: Request) {
     const transaction = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey: sender,
-        toPubkey: new PublicKey("8vbaCLhg1SZmiGNZfFzV2DEJHenFtdgg7G2JtY5v74i1"),
+        toPubkey: new PublicKey(process.env.SOLANA_RECIPIENT_ADDRESS || "8vbaCLhg1SZmiGNZfFzV2DEJHenFtdgg7G2JtY5v74i1"),
         lamports: amount * LAMPORTS_PER_SOL,
       })
     );
@@ -115,20 +111,18 @@ export async function POST(request: Request) {
     transaction.recentBlockhash = blockheight.blockhash;
     transaction.lastValidBlockHeight = blockheight.lastValidBlockHeight;
     transaction.feePayer = sender;
-    // transaction.sign(payer);
-    const campaign = new Creator({
-      title: url.searchParams.get("title"),
-      description: url.searchParams.get("description"),
-      icons: url.searchParams.get("icon"),
-      label: url.searchParams.get("label"),
-      end: url.searchParams.get("end"),
+
+    const [data] = await db.insert(creators).values({
+      title: url.searchParams.get("title") || "",
+      description: url.searchParams.get("description") || "",
+      icons: url.searchParams.get("icon") || "",
+      label: url.searchParams.get("label") || "",
+      end: new Date(url.searchParams.get("end") || ""),
       amount: amount,
       users: [],
       solAdd: sender.toString(),
-    });
+    }).returning();
 
-    const data = await campaign.save();
-    // camurl = campaign._id;
     if (data) {
       payload = {
         type: "transaction",
@@ -137,27 +131,12 @@ export async function POST(request: Request) {
           .toString("base64"),
         message: `Campaign Created`,
       };
-      // links: {
-      //     next: {
-      //         type:"post",
-      //         href: `${url.origin}/api/redirect/${url.pathname.split("/")[3]}`,
-      //     },
-      // }
     } else {
       return Response.error();
     }
-
-    // const newUser = new User({
-    //     solAdd: sender.toString(),
-    // post:  url.href.toString(),
-    // isAwarded: false,
-
-    //   });
-
-    //   await newUser.save();
   } catch (e) {
     return Response.json(
-      { error: e },
+      { error: e instanceof Error ? e.message : "Unknown error" },
       { status: 400, headers: ACTIONS_CORS_HEADERS }
     );
   }
@@ -165,13 +144,4 @@ export async function POST(request: Request) {
   return Response.json(payload, {
     headers: ACTIONS_CORS_HEADERS,
   });
-  // // Redirect to a specific page after transaction creation
-  // const redirectUrl = new URL('/some-page', url.origin);
-  // redirectUrl.searchParams.set('transaction', payload.transaction);
-  // redirectUrl.searchParams.set('message', payload.message);
-
-  // return Response.redirect(redirectUrl.toString(), 302);
-  // return Response.json(payload, {
-  //     headers: ACTIONS_CORS_HEADERS,
-  // });
 }

@@ -13,9 +13,9 @@ function ReclaimDemo() {
     // Your credentials from the Reclaim Developer Portal
     // Replace these with your actual credentials
 
-    const APP_ID = '0xF31aa56D97CeC403f1da64d37c5cA315a3Fa0b05';
-    const APP_SECRET = 'YOUR_APPLICATION_SECRET';
-    const PROVIDER_ID = 'c8a77c4a-7ff2-4ef2-a7a3-c0ad9cf92aec';
+    const APP_ID = process.env.NEXT_PUBLIC_RECLAIM_APP_ID || '';
+    const APP_SECRET = process.env.NEXT_PUBLIC_RECLAIM_APP_SECRET || '';
+    const PROVIDER_ID = process.env.NEXT_PUBLIC_RECLAIM_PROVIDER_ID || '';
  
     // Initialize the Reclaim SDK with your credentials
     const reclaimProofRequest = await ReclaimProofRequest.init(APP_ID, APP_SECRET, PROVIDER_ID);
