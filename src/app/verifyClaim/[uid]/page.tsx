@@ -1,11 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 // NOTE: ReclaimProofRequest is dynamically imported inside the handler so that
 // it never hits the SSR bundle. The SDK pulls in `pino` which requires
 // `pino-pretty` as a transport — bundling it server-side breaks the build.
 import CircularProgress from "@mui/material/CircularProgress";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 
 const APP_ID = process.env.NEXT_PUBLIC_RECLAIM_APP_ID || "0x896b97E0915ae00C61D8bb88b9f6A76d273cfE76";
@@ -28,12 +29,30 @@ const PROVIDER_MAP: Record<Platform, string> = {
 };
 
 const Page = () => {
+  const searchParams = useSearchParams();
+  const preselectedPlatform = searchParams?.get("platform") as Platform | null;
+  const campaignIdParam = searchParams?.get("campaignId");
+
   const [res, setRes] = useState("");
-  const [activePlatform, setActivePlatform] = useState<Platform | null>(null);
+  const [activePlatform, setActivePlatform] = useState<Platform | null>(
+    preselectedPlatform &&
+      ["instagram", "twitter", "youtube", "tiktok"].includes(preselectedPlatform)
+      ? preselectedPlatform
+      : null,
+  );
   const [qrState, setQrState] = useState<
     "none" | "loading" | "waiting" | "success"
   >("none");
   const [qrUrl, setQrUrl] = useState("");
+
+  // When the user arrives here from the Join modal with ?platform=&campaignId=,
+  // scroll the right platform button into view so the next step is obvious.
+  useEffect(() => {
+    if (preselectedPlatform) {
+      const el = document.getElementById(`verify-btn-${preselectedPlatform}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [preselectedPlatform]);
 
   const verifyOnReclaim = async (platform: Platform) => {
     const providerId = PROVIDER_MAP[platform];
@@ -107,9 +126,24 @@ const Page = () => {
       style={{ textAlign: "center", padding: "20px" }}
       className="mt-40 text-white"
     >
+      {campaignIdParam && (
+        <div className="mx-auto mb-6 max-w-xl flex items-center justify-center gap-3 text-xs text-zinc-400">
+          <Link href="/discover" className="text-[#14F195] hover:underline">
+            \u2190 Back to Discover
+          </Link>
+          <span className="text-zinc-600">\u00B7</span>
+          <span>Submitting proof for campaign</span>
+          <code className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-zinc-300">
+            {campaignIdParam.slice(0, 8)}\u2026
+          </code>
+        </div>
+      )}
+
       <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Verify your engagement</h1>
       <p className="mt-2 text-sm text-zinc-400 max-w-md mx-auto">
-        Pick a platform. We'll generate a zkTLS proof via Reclaim.
+        {preselectedPlatform
+          ? `You\u2019re about to verify a ${preselectedPlatform} post. Scan the QR with your phone and log in through the Reclaim flow.`
+          : "Pick a platform. We'll generate a zkTLS proof via Reclaim."}
       </p>
 
       <div className="mx-auto mt-5 max-w-xl rounded-xl border border-[#14F195]/20 bg-[#14F195]/5 p-4 text-left text-xs text-zinc-300">
@@ -131,18 +165,24 @@ const Page = () => {
         className="flex flex-col justify-center items-center"
         style={{ margin: "20px 0" }}
       >
-        {buttons.map((b) => (
-          <button
-            key={b.platform}
-            onClick={() => verifyOnReclaim(b.platform)}
-            disabled={qrState === "loading" || qrState === "waiting"}
-            className={b.className}
-          >
-            {qrState !== "none" && activePlatform === b.platform
-              ? "Processing…"
-              : b.label}
-          </button>
-        ))}
+        {buttons.map((b) => {
+          const highlighted = preselectedPlatform === b.platform;
+          return (
+            <button
+              key={b.platform}
+              id={`verify-btn-${b.platform}`}
+              onClick={() => verifyOnReclaim(b.platform)}
+              disabled={qrState === "loading" || qrState === "waiting"}
+              className={`${b.className} ${highlighted ? "ring-2 ring-[#14F195] ring-offset-2 ring-offset-black scale-[1.02]" : ""}`}
+            >
+              {qrState !== "none" && activePlatform === b.platform
+                ? "Processing\u2026"
+                : highlighted
+                  ? `\u2192 ${b.label}`
+                  : b.label}
+            </button>
+          );
+        })}
       </div>
 
       <div
