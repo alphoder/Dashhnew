@@ -126,6 +126,9 @@ export function CampaignDetailsModal({
   const [loading, setLoading] = useState(false);
   const [joining, setJoining] = useState(false);
   const [joined, setJoined] = useState(false);
+  // Participation id returned from /participate — we need it so the "submit
+  // proof" button can deep-link into the verifyClaim page for THIS enrolment.
+  const [participationId, setParticipationId] = useState<string | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [leaderboard, setLeaderboard] = useState<
     { wallet: string; views: number; proofs: number; earned: number }[] | null
@@ -134,6 +137,7 @@ export function CampaignDetailsModal({
   useEffect(() => {
     if (!open) return;
     setJoined(false);
+    setParticipationId(null);
     setAcceptedTerms(false);
     setLeaderboard(null);
     // Preloaded wins — skip the fetch entirely.
@@ -246,8 +250,11 @@ export function CampaignDetailsModal({
         const err = await res.json().catch(() => null);
         throw new Error(err?.error ?? `Status ${res.status}`);
       }
+      const body = await res.json().catch(() => ({}));
+      const pid = body?.participation?.id ?? null;
+      setParticipationId(pid);
       setJoined(true);
-      toast.success('Signed & joined the campaign');
+      toast.success('You\u2019re in \u2014 now post the content & submit a proof');
     } catch (err: any) {
       console.error(err);
       toast.error(err?.message ?? 'Could not join. Try again?');
@@ -461,17 +468,111 @@ export function CampaignDetailsModal({
                 </div>
               )}
 
-              {/* What happens when you join */}
-              <div className="rounded-xl border border-white/10 bg-black/40 p-4 text-sm text-zinc-300">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-zinc-500 mb-2">
-                  When you join
-                </p>
-                <ol className="space-y-1.5 list-decimal list-inside marker:text-[#14F195]">
-                  <li>Post the content on your {platformMeta?.label} account.</li>
-                  <li>Submit a zkTLS proof via Reclaim — we scrape the view count, nothing else.</li>
-                  <li>Payout settles per the model above once the proof verifies.</li>
-                </ol>
-              </div>
+              {/* What happens when you join — turns into the live action panel
+                  after successful join so the creator always has a visible
+                  next step. */}
+              {!joined ? (
+                <div className="rounded-xl border border-white/10 bg-black/40 p-4 text-sm text-zinc-300">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-zinc-500 mb-2">
+                    When you join
+                  </p>
+                  <ol className="space-y-1.5 list-decimal list-inside marker:text-[#14F195]">
+                    <li>Post the content on your {platformMeta?.label} account.</li>
+                    <li>Submit a zkTLS proof via Reclaim — we scrape the view count, nothing else.</li>
+                    <li>Payout settles per the model above once the proof verifies.</li>
+                  </ol>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-[#14F195]/30 bg-gradient-to-br from-[#14F195]/10 to-black p-5 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="rounded-full bg-[#14F195] p-1.5">
+                      <ShieldCheck className="h-4 w-4 text-black" />
+                    </div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#14F195]">
+                      You\u2019re in. Two steps left.
+                    </p>
+                  </div>
+
+                  <ol className="space-y-3 text-sm text-zinc-200">
+                    <li className="flex gap-3">
+                      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-[#14F195]/40 bg-black text-[11px] font-semibold text-[#14F195]">
+                        1
+                      </span>
+                      <div className="flex-1">
+                        <p className="font-medium text-white">
+                          Post the content on {platformMeta?.label}.
+                        </p>
+                        <p className="mt-0.5 text-xs text-zinc-400">
+                          Must include the brand\u2019s required hashtag, mention or
+                          phrase from the terms above \u2014 otherwise the proof is
+                          disqualified.
+                        </p>
+                        <Link
+                          href={
+                            campaign.platform === 'instagram'
+                              ? 'https://instagram.com'
+                              : campaign.platform === 'youtube'
+                                ? 'https://studio.youtube.com'
+                                : campaign.platform === 'twitter'
+                                  ? 'https://x.com/compose/post'
+                                  : 'https://tiktok.com/upload'
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-1.5 inline-flex items-center gap-1 text-xs text-[#14F195] hover:underline"
+                        >
+                          Open {platformMeta?.label} in a new tab <ExternalLink className="h-3 w-3" />
+                        </Link>
+                      </div>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-[#14F195]/40 bg-black text-[11px] font-semibold text-[#14F195]">
+                        2
+                      </span>
+                      <div className="flex-1">
+                        <p className="font-medium text-white">
+                          Submit your zkTLS proof.
+                        </p>
+                        <p className="mt-0.5 text-xs text-zinc-400">
+                          Scan the Reclaim QR code with your phone, log into
+                          {` ${platformMeta?.label} `}
+                          inside the Reclaim app, and we\u2019ll capture the view
+                          count \u2014 nothing else.
+                        </p>
+                      </div>
+                    </li>
+                  </ol>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Link
+                      href={`/verifyClaim/${participationId ?? campaign.id}?platform=${campaign.platform}&campaignId=${campaign.id}`}
+                      className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-gradient-to-r from-[#14F195] to-[#9945FF] px-4 py-2.5 text-sm font-semibold text-black hover:opacity-90"
+                      onClick={() => onOpenChange(false)}
+                    >
+                      <Zap className="h-4 w-4" />
+                      Submit zkTLS proof now
+                    </Link>
+                    <Link
+                      href={`/creatordashboard?participation=${participationId ?? ''}`}
+                      className="flex-1 inline-flex items-center justify-center gap-2 rounded-md border border-white/10 bg-black/40 px-4 py-2.5 text-sm font-medium text-zinc-200 hover:bg-white/5"
+                      onClick={() => onOpenChange(false)}
+                    >
+                      Save for later \u2014 go to my dashboard
+                    </Link>
+                  </div>
+
+                  <p className="text-[11px] text-zinc-500">
+                    Come back any time \u2014 you have until
+                    {' '}
+                    <span className="text-white">
+                      {new Date(
+                        new Date(campaign.endsAt).getTime() + 7 * 86_400_000,
+                      ).toLocaleDateString()}
+                    </span>
+                    {' '}to submit your final proof before forfeiture.
+                  </p>
+                </div>
+              )}
 
               {/* Disqualification notice + creator T&C */}
               {!campaign.blinkUrl && (
@@ -515,31 +616,32 @@ export function CampaignDetailsModal({
                 </div>
               )}
 
-              {/* CTA */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  onClick={handleJoin}
-                  disabled={joining || joined || (!campaign.blinkUrl && !acceptedTerms)}
-                  className="flex-1 bg-gradient-to-r from-[#14F195] to-[#9945FF] text-black font-semibold hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {joined
-                    ? 'Joined ✓'
-                    : joining
-                      ? 'Signing & joining…'
+              {/* CTA — hidden once the user has joined; the "What's next"
+                  panel above takes over as the primary action zone. */}
+              {!joined && (
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    onClick={handleJoin}
+                    disabled={joining || (!campaign.blinkUrl && !acceptedTerms)}
+                    className="flex-1 bg-gradient-to-r from-[#14F195] to-[#9945FF] text-black font-semibold hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {joining
+                      ? 'Signing & joining\u2026'
                       : campaign.blinkUrl
                         ? 'Open Blink to participate'
                         : acceptedTerms
                           ? 'Sign terms & join'
                           : 'Agree to terms first'}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => onOpenChange(false)}
-                  className="border-white/10 bg-transparent text-zinc-300 hover:bg-white/5"
-                >
-                  Close
-                </Button>
-              </div>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => onOpenChange(false)}
+                    className="border-white/10 bg-transparent text-zinc-300 hover:bg-white/5"
+                  >
+                    Close
+                  </Button>
+                </div>
+              )}
             </div>
           </>
         )}
