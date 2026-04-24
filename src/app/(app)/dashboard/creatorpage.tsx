@@ -10,12 +10,13 @@ import {
 import { PendingViewsBanner } from '@/components/pending-views-banner';
 import type { ICreator } from '@/lib/interface/creator';
 import { Compass, Coins, Rocket, Sparkles, Search, Inbox } from 'lucide-react';
+import { dialtoBlinkUrl } from '@/lib/blink-url';
 
 type Filter = 'all' | 'participated' | 'live';
 
 // Convert a v1 creators-row into the FullCampaign shape the modal expects.
 function v1ToFullCampaign(c: ICreator): FullCampaign {
-  const blinkUrl = `https://dial.to/?action=solana-action:https://blinks.knowflow.study/api/donate/${c.id}&cluster=devnet`;
+  const blinkUrl = dialtoBlinkUrl(c.id);
   return {
     id: c.id,
     title: c.title,
