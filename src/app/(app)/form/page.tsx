@@ -95,6 +95,11 @@ export default function CreatorForm() {
   const [topNCount, setTopNCount] = useState<number>(3);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
+  // Platform target — required by /api/v2/campaigns. Defaults to Instagram
+  // since that's the most popular provider in the seeded/live data.
+  type Platform = "instagram" | "youtube" | "twitter" | "tiktok";
+  const [platform, setPlatform] = useState<Platform>("instagram");
+
   // Content-match rules — what the creator's post MUST contain
   const [requiredHashtag, setRequiredHashtag] = useState("");
   const [requiredMention, setRequiredMention] = useState("");
@@ -202,43 +207,65 @@ export default function CreatorForm() {
       const { signature, issuedAt } = await signTerms(wallet);
       toast.success("Terms signed");
 
-      // Step 2: Post to the API (includes payment + signed terms)
+      // Step 2: POST to the v2 campaigns API so the row lands in
+      // `campaigns_v2` — the same table the Discover/Explore page reads from.
+      // (Previously this hit the legacy /api/posts, which wrote to the old v1
+      // `creators` table and never surfaced in the new UI.)
       const formData = new FormData(e.target as HTMLFormElement);
+      const iconUrlRaw = String(formData.get("icons") || "").trim();
+      // iconUrl is required + must be a valid URL on the v2 schema. Fall back
+      // to a default Solana avatar if the brand didn't provide one so the
+      // campaign still lists — they can edit later.
+      const iconUrl = isValidURL(iconUrlRaw)
+        ? iconUrlRaw
+        : "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png";
+
       const payload = {
-        solAdd: wallet,
-        title: formData.get("title"),
-        description: formData.get("description"),
-        label: formData.get("label"),
-        amount: formData.get("amount"),
-        icons: formData.get("icons"),
-        end: endDate ? endDate.toISOString() : new Date().toISOString(),
-        // v2 payment-terms fields — /api/posts stores what it knows, ignores the rest
+        // Session-fallback: the v2 POST accepts brandWallet when no SIWS
+        // session cookie is present. Form flow signs via Phantom directly,
+        // not via SIWS, so we must include the wallet.
+        brandWallet: wallet,
+        title: String(formData.get("title") || ""),
+        description: String(formData.get("description") || ""),
+        platform,
+        iconUrl,
+        ctaLabel: String(formData.get("label") || "Join campaign"),
+        budget: budgetNumber,
+        cpv: 0.1,
         paymentModel,
         topNCount: paymentModel === "split_top_n" ? topNCount : undefined,
         platformFeeBps: PLATFORM_FEE_BPS,
         termsVersion: TERMS_VERSION,
         termsSignature: signature,
         termsSignedAt: issuedAt,
-        // Content-match markers
         requiredHashtag: requiredHashtag.trim() || undefined,
         requiredMention: requiredMention.trim() || undefined,
         requiredPhrase: requiredPhrase.trim() || undefined,
+        startsAt: new Date().toISOString(),
+        endsAt: endDate ? endDate.toISOString() : new Date(Date.now() + 14 * 86_400_000).toISOString(),
       };
 
-      const res = await axios.post("/api/posts", payload, {
+      const res = await axios.post("/api/v2/campaigns", payload, {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (res.data?.data?.id) {
+      const createdId = res.data?.campaign?.id;
+      if (createdId) {
         // Step 3: Fund the escrow (20% platform fee + 80% creator pool all
         // go to the same recipient for now; future escrow program will split)
         toast.info("Funding campaign escrow…");
-        setFormAmount(Number(formData.get("amount")));
+        setFormAmount(budgetNumber);
         await sendTransaction(wallet, budgetNumber);
 
-        seturl_data(res.data.data.id);
+        seturl_data(createdId);
         setOpen(true);
-        toast.success("Campaign created");
+        toast.success("Campaign created \u2014 live on Explore now");
+      } else {
+        toast.error(
+          res.data?.error
+            ? `Validation failed: ${JSON.stringify(res.data.error).slice(0, 140)}`
+            : "Campaign creation failed",
+        );
       }
     } catch (err: any) {
       console.error(err);
@@ -362,6 +389,28 @@ export default function CreatorForm() {
                       value={content.description}
                       onChange={(e) => setContent({ ...content, description: e.target.value })}
                       className="bg-black/60 border-white/10 text-white placeholder:text-zinc-500 focus:border-[#14F195] focus:ring-[#14F195]" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-xs font-medium uppercase tracking-wide text-zinc-400">Platform</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {(["instagram", "youtube", "twitter", "tiktok"] as const).map((p) => (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => setPlatform(p)}
+                          className={`rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition ${
+                            platform === p
+                              ? "border-[#14F195] bg-[#14F195]/10 text-[#14F195]"
+                              : "border-white/10 bg-black/40 text-zinc-400 hover:border-white/20 hover:text-white"
+                          }`}
+                        >
+                          {p === "twitter" ? "X (Twitter)" : p}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-zinc-500">
+                      Creators on this platform will see your campaign on the Discover feed.
+                    </p>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="grid gap-2">

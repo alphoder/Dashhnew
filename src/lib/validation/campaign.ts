@@ -17,12 +17,21 @@ export const createCampaignSchema = z
     iconUrl: z.string().url(),
     ctaLabel: z.string().min(2).max(30),
     budget: z.number().positive(),
-    cpv: z.number().positive(),
+    // cpv (cost per view) is optional in the form flow — if omitted we
+    // default to 0.1 SOL to match the UI copy. The v2 API enforces the field
+    // exists in the DB so a fallback here keeps old form payloads valid.
+    cpv: z.number().positive().default(0.1),
     paymentModel: paymentModelSchema.default('per_view'),
     topNCount: z.number().int().positive().max(100).optional(),
     platformFeeBps: z.number().int().min(0).max(5000).default(2000),
     termsVersion: z.string().default('v1'),
     termsSignature: z.string().min(10),
+    // Content-match rules — what the creator's post MUST contain. Any of these
+    // may be omitted if the brand doesn't require it; the verify pipeline skips
+    // checks for blank markers.
+    requiredHashtag: z.string().trim().optional(),
+    requiredMention: z.string().trim().optional(),
+    requiredPhrase: z.string().trim().optional(),
     startsAt: z.coerce.date(),
     endsAt: z.coerce.date(),
   })
