@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ICreator } from '@/lib/interface/creator';
 import { Clock, Trophy, Eye } from 'lucide-react';
+import { dialtoBlinkUrl } from '@/lib/blink-url';
 
 interface Props {
   content: ICreator;
@@ -27,16 +28,9 @@ export function SolanaBlinksCard({ content, id, onView }: Props) {
       )
     : 'N/A';
 
-  const getDashboardLink = () => {
-    if (typeof window !== 'undefined') {
-      const hostname = window.location.hostname;
-      if (hostname === 'localhost') {
-        return `/dashboard/${id}`;
-      }
-      return `https://blinks.knowflow.study/dashboard/${id}`;
-    }
-    return `https://blinks.knowflow.study/dashboard/${id}`;
-  };
+  // Dashboard link always stays on the current deployment — relative URL
+  // avoids the old v1 blinks.knowflow.study domain.
+  const getDashboardLink = () => `/dashboard/${id}`;
 
   return (
     <div className="relative w-full max-w-[22rem] min-w-80 rounded-xl overflow-hidden sm:w-[20rem] md:w-[25rem] bg-[#0a0a0a]/40 backdrop-blur-sm border border-white/5 shadow-xl">
@@ -95,7 +89,7 @@ export function SolanaBlinksCard({ content, id, onView }: Props) {
             </button>
           ) : (
             <Link
-              href={`https://dial.to/?action=solana-action:https://blinks.knowflow.study/api/donate/${id}&cluster=devnet`}
+              href={dialtoBlinkUrl(id)}
               className="block w-full py-2 text-center font-semibold text-white rounded-lg bg-gradient-to-r from-[#9945FF] to-[#14F195] hover:opacity-90 transition-all duration-300"
             >
               BLINK NOW

@@ -37,6 +37,7 @@ import {
   PLATFORM_FEE_PERCENT,
   buildTermsMessage,
 } from "@/lib/terms";
+import { dialtoBlinkUrl } from "@/lib/blink-url";
 
 export const dynamic = "force-dynamic";
 
@@ -296,9 +297,7 @@ export default function CreatorForm() {
               <Button
                 className="mt-4 w-full bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white hover:opacity-90"
                 onClick={() => {
-                  navigator.clipboard.writeText(
-                    `https://dial.to/?action=solana-action:https://blinks.knowflow.study/api/donate/${url_data}&cluster=devnet`,
-                  );
+                  navigator.clipboard.writeText(dialtoBlinkUrl(url_data));
                   toast.success("Link copied to clipboard");
                 }}
               >
@@ -309,12 +308,12 @@ export default function CreatorForm() {
               <div className="flex flex-col items-center space-y-3 opacity-70">
                 <div className="flex space-x-2">
                   <Link
-                    href={`https://twitter.com/intent/tweet?text=New%20DASHH%20campaign%20live%20-%20join%20it!&url=https://dial.to/?action=solana-action:https://blinks.knowflow.study/api/donate/${url_data}&cluster=devnet`}
+                    href={`https://twitter.com/intent/tweet?text=New%20DASHH%20campaign%20live%20-%20join%20it!&url=${encodeURIComponent(dialtoBlinkUrl(url_data))}`}
                   >
                     <Button className="bg-[#1DA1F2] text-white">Share on X</Button>
                   </Link>
                   <Link
-                    href={`https://discord.com/channels/@me?url=https://dial.to/?action=solana-action:https://blinks.knowflow.study/api/donate/${url_data}&cluster=devnet`}
+                    href={`https://discord.com/channels/@me?url=${encodeURIComponent(dialtoBlinkUrl(url_data))}`}
                   >
                     <Button className="bg-indigo-500 text-white">Share on Discord</Button>
                   </Link>
@@ -633,7 +632,7 @@ export default function CreatorForm() {
                   </div>
                 </div>
                 <div className="text-zinc-500 flex gap-2 items-center mt-3">
-                  <p className="text-[12px] font-semibold">blinks.knowflow.study</p>
+                  <p className="text-[12px] font-semibold">dashhnew.vercel.app</p>
                   <FontAwesomeIcon icon={faShieldHalved} size="sm" />
                 </div>
                 <h2 className="mt-2 text-lg font-semibold text-white">
