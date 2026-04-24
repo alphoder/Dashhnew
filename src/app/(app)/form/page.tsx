@@ -117,8 +117,18 @@ export default function CreatorForm() {
 
   // Fund-on-chain transfer (same behaviour as v1 — direct transfer acting as
   // a stand-in for a future escrow program).
+  //
+  // Blockhash handling: devnet's default public RPC is slow + rate-limited, so
+  // the blockhash often expires between `getLatestBlockhash` and `sendRaw`.
+  // We: (1) prefer the app-configured RPC via NEXT_PUBLIC_SOLANA_RPC, (2) fetch
+  // the blockhash with 'finalized' commitment so it's valid for the full ~60s
+  // window, (3) pass the full blockhash-with-expiry-height tuple to
+  // `confirmTransaction` so the RPC knows how long to wait, (4) use
+  // `skipPreflight: false, maxRetries: 3` so transient 429s get retried.
   async function sendTransaction(sender: string, amount: number) {
-    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const rpc =
+      process.env.NEXT_PUBLIC_SOLANA_RPC || clusterApiUrl("devnet");
+    const connection = new Connection(rpc, "confirmed");
     const recipientAddress = new PublicKey(
       "8vbaCLhg1SZmiGNZfFzV2DEJHenFtdgg7G2JtY5v74i1",
     );
@@ -132,16 +142,24 @@ export default function CreatorForm() {
       }),
     );
 
-    const { blockhash } = await connection.getLatestBlockhash();
-    transaction.recentBlockhash = blockhash;
+    const latest = await connection.getLatestBlockhash("finalized");
+    transaction.recentBlockhash = latest.blockhash;
     transaction.feePayer = senderPublicKey;
 
     const { solana }: any = window;
     const signedTransaction = await solana.signTransaction(transaction);
     const signature = await connection.sendRawTransaction(
       signedTransaction.serialize(),
+      { skipPreflight: false, maxRetries: 3 },
     );
-    await connection.confirmTransaction(signature);
+    await connection.confirmTransaction(
+      {
+        signature,
+        blockhash: latest.blockhash,
+        lastValidBlockHeight: latest.lastValidBlockHeight,
+      },
+      "confirmed",
+    );
     return signature;
   }
 

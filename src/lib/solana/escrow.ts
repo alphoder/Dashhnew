@@ -42,8 +42,11 @@ export async function buildPayoutTransaction({
     }),
   );
 
-  const { blockhash } = await connection.getLatestBlockhash();
-  tx.recentBlockhash = blockhash;
+  // 'finalized' commitment gives us the longest possible validity window
+  // (~60s) between building, signing, and submitting the tx — important on
+  // the public devnet RPC which is slow and rate-limited.
+  const latest = await connection.getLatestBlockhash("finalized");
+  tx.recentBlockhash = latest.blockhash;
   tx.feePayer = from;
   return tx;
 }

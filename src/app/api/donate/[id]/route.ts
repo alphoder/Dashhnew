@@ -85,7 +85,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
     );
   }
 
-  const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+  const rpc = process.env.NEXT_PUBLIC_SOLANA_RPC || clusterApiUrl("devnet");
+  const connection = new Connection(rpc, "confirmed");
 
   const transaction = new Transaction().add(
     SystemProgram.transfer({
@@ -95,7 +96,9 @@ export async function POST(request: Request, { params }: { params: { id: string 
     })
   );
 
-  const blockheight = await connection.getLatestBlockhash();
+  // 'finalized' gives the widest validity window; Blinks often spend
+  // 30–60s in the wallet-UI handoff before submission.
+  const blockheight = await connection.getLatestBlockhash("finalized");
   transaction.recentBlockhash = blockheight.blockhash;
   transaction.lastValidBlockHeight = blockheight.lastValidBlockHeight;
   transaction.feePayer = sender;

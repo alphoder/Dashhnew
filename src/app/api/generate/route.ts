@@ -97,7 +97,8 @@ export async function POST(request: Request) {
   try {
     sender = new PublicKey(body.account);
 
-    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const rpc = process.env.NEXT_PUBLIC_SOLANA_RPC || clusterApiUrl("devnet");
+    const connection = new Connection(rpc, "confirmed");
 
     const transaction = new Transaction().add(
       SystemProgram.transfer({
@@ -107,7 +108,9 @@ export async function POST(request: Request) {
       })
     );
 
-    const blockheight = await connection.getLatestBlockhash();
+    // 'finalized' — blinks hand the tx through a chain of surfaces before the
+    // wallet prompt, which easily burns 30–60s of validity.
+    const blockheight = await connection.getLatestBlockhash("finalized");
     transaction.recentBlockhash = blockheight.blockhash;
     transaction.lastValidBlockHeight = blockheight.lastValidBlockHeight;
     transaction.feePayer = sender;
