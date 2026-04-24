@@ -39,7 +39,8 @@ const Getsoladd = ({ leaderboard, id, creator }: { leaderboard: IUser[], id: str
       return;
     }
 
-    const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+    const rpc = process.env.NEXT_PUBLIC_SOLANA_RPC || clusterApiUrl('devnet');
+    const connection = new Connection(rpc, 'confirmed');
     if (!leaderboard.length) {
       console.error('Leaderboard is empty');
       return;
@@ -56,14 +57,27 @@ const Getsoladd = ({ leaderboard, id, creator }: { leaderboard: IUser[], id: str
     );
 
     try {
-      const { blockhash } = await connection.getLatestBlockhash(); // Fetch recent blockhash
-      transaction.recentBlockhash = blockhash;
-      transaction.feePayer = senderPublicKey; // Set fee payer to sender's public key
+      // Fetch with 'finalized' for max validity window, and pass full
+      // blockhash-with-expiry to confirmTransaction so RPC knows when to stop
+      // waiting. Retry preflight up to 3× for flaky public-devnet 429s.
+      const latest = await connection.getLatestBlockhash('finalized');
+      transaction.recentBlockhash = latest.blockhash;
+      transaction.feePayer = senderPublicKey;
 
       const { solana }: any = window;
-      const signedTransaction = await solana.signTransaction(transaction); // Sign transaction with Phantom
-      const signature = await connection.sendRawTransaction(signedTransaction.serialize()); // Send signed transaction
-      await connection.confirmTransaction(signature); // Confirm the transaction
+      const signedTransaction = await solana.signTransaction(transaction);
+      const signature = await connection.sendRawTransaction(
+        signedTransaction.serialize(),
+        { skipPreflight: false, maxRetries: 3 },
+      );
+      await connection.confirmTransaction(
+        {
+          signature,
+          blockhash: latest.blockhash,
+          lastValidBlockHeight: latest.lastValidBlockHeight,
+        },
+        'confirmed',
+      );
 
       console.log('Transaction successful, signature:', signature);
     } catch (error) {
