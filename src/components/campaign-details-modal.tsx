@@ -133,6 +133,21 @@ export function CampaignDetailsModal({
   const [leaderboard, setLeaderboard] = useState<
     { wallet: string; views: number; proofs: number; earned: number }[] | null
   >(null);
+  // Brand-side actions (cancel before joins / refund after window)
+  const [viewerWallet, setViewerWallet] = useState<string | null>(null);
+  const [brandActionState, setBrandActionState] = useState<
+    | { kind: 'idle' }
+    | { kind: 'cancelling' }
+    | { kind: 'refunding' }
+    | { kind: 'done'; message: string; txSignature?: string }
+    | { kind: 'error'; message: string }
+  >({ kind: 'idle' });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setViewerWallet(window.localStorage.getItem('dashh_wallet'));
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -183,6 +198,86 @@ export function CampaignDetailsModal({
       active = false;
     };
   }, [open, campaign]);
+
+  // Brand-only: cancel a campaign that nobody has joined yet. Refunds the
+  // full escrow back to the brand wallet. The API enforces both the
+  // brand-only check and the zero-participants invariant; we still gate the
+  // UI to avoid offering a button that the API will reject.
+  async function handleBrandCancel() {
+    if (!campaign) return;
+    const wallet = viewerWallet;
+    if (!wallet || wallet !== campaign.brandWallet) {
+      toast.error('Only the brand wallet that created this campaign can cancel it.');
+      return;
+    }
+    const confirmed = window.confirm(
+      `Cancel "${campaign.title}" and refund ${campaign.budget.toFixed(4)} SOL to your wallet?\n\nThis is only allowed while zero creators have joined. The action is permanent.`,
+    );
+    if (!confirmed) return;
+    setBrandActionState({ kind: 'cancelling' });
+    try {
+      const res = await fetch(`/api/v2/campaigns/${campaign.id}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ brandWallet: wallet }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = data?.error ?? `Status ${res.status}`;
+        setBrandActionState({ kind: 'error', message: String(msg) });
+        toast.error(`Cancel failed: ${msg}`);
+        return;
+      }
+      setBrandActionState({
+        kind: 'done',
+        message: `Cancelled · ${data?.cancelled?.amount?.toFixed(4) ?? '?'} SOL refunded`,
+        txSignature: data?.cancelled?.txSignature,
+      });
+      toast.success('Campaign cancelled — refund issued.');
+    } catch (err: any) {
+      setBrandActionState({ kind: 'error', message: err?.message ?? 'cancel failed' });
+      toast.error('Could not cancel — try again.');
+    }
+  }
+
+  // Brand-only: claim the post-window refund when no creators ever settled.
+  // Available after campaign.endsAt + settlementWindowDays (default 7 days).
+  async function handleBrandRefund() {
+    if (!campaign) return;
+    const wallet = viewerWallet;
+    if (!wallet || wallet !== campaign.brandWallet) {
+      toast.error('Only the brand wallet can claim a refund.');
+      return;
+    }
+    const confirmed = window.confirm(
+      `Refund "${campaign.title}" for ${campaign.budget.toFixed(4)} SOL?\n\nThis is only available because no creator submitted a verified final proof inside the 7-day window. Action is permanent.`,
+    );
+    if (!confirmed) return;
+    setBrandActionState({ kind: 'refunding' });
+    try {
+      const res = await fetch(`/api/v2/campaigns/${campaign.id}/refund`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ brandWallet: wallet }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = data?.error ?? `Status ${res.status}`;
+        setBrandActionState({ kind: 'error', message: String(msg) });
+        toast.error(`Refund failed: ${msg}`);
+        return;
+      }
+      setBrandActionState({
+        kind: 'done',
+        message: `Refunded · ${data?.refund?.amount?.toFixed(4) ?? '?'} SOL`,
+        txSignature: data?.refund?.txSignature,
+      });
+      toast.success('Refund issued.');
+    } catch (err: any) {
+      setBrandActionState({ kind: 'error', message: err?.message ?? 'refund failed' });
+      toast.error('Could not refund — try again.');
+    }
+  }
 
   async function signCreatorTerms(wallet: string): Promise<string | null> {
     if (!campaign) return null;
@@ -467,6 +562,70 @@ export function CampaignDetailsModal({
                   No creators yet — be the first to join.
                 </div>
               )}
+
+              {/* Brand actions — only the wallet that created the campaign
+                  sees these. Cancel is available while the campaign is
+                  active AND has zero participations. Refund is available
+                  after the campaign + 7-day window has closed with no
+                  settled creators. */}
+              {campaign &&
+                viewerWallet === campaign.brandWallet &&
+                campaign.status !== 'cancelled' &&
+                campaign.status !== 'completed' && (
+                  <div className="rounded-xl border border-[#9945FF]/30 bg-gradient-to-br from-[#9945FF]/10 to-black p-4 space-y-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#9945FF]">
+                      Brand actions
+                    </p>
+                    {brandActionState.kind === 'done' ? (
+                      <div className="rounded-md bg-black/40 p-3 text-sm text-[#14F195]">
+                        ✓ {brandActionState.message}
+                        {brandActionState.txSignature && (
+                          <p className="mt-1 truncate text-[10px] text-zinc-500">
+                            tx: {brandActionState.txSignature}
+                          </p>
+                        )}
+                      </div>
+                    ) : brandActionState.kind === 'error' ? (
+                      <div className="rounded-md border border-red-500/30 bg-red-500/5 p-3 text-sm text-red-300">
+                        {brandActionState.message}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-2 sm:flex-row">
+                        {leaderboard?.length === 0 &&
+                          new Date(campaign.endsAt) > new Date() && (
+                            <button
+                              onClick={handleBrandCancel}
+                              disabled={brandActionState.kind === 'cancelling'}
+                              className="flex-1 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-200 hover:bg-red-500/20 disabled:opacity-60"
+                            >
+                              {brandActionState.kind === 'cancelling'
+                                ? 'Cancelling…'
+                                : `Cancel & refund ${campaign.budget.toFixed(4)} SOL`}
+                            </button>
+                          )}
+                        {new Date(campaign.endsAt).getTime() +
+                          7 * 86_400_000 <
+                          Date.now() &&
+                          !leaderboard?.some((l) => l.earned > 0) && (
+                            <button
+                              onClick={handleBrandRefund}
+                              disabled={brandActionState.kind === 'refunding'}
+                              className="flex-1 rounded-md border border-[#9945FF]/40 bg-[#9945FF]/10 px-3 py-2 text-sm font-medium text-[#c8a8ff] hover:bg-[#9945FF]/20 disabled:opacity-60"
+                            >
+                              {brandActionState.kind === 'refunding'
+                                ? 'Refunding…'
+                                : `Claim refund · ${campaign.budget.toFixed(4)} SOL`}
+                            </button>
+                          )}
+                      </div>
+                    )}
+                    <p className="text-[11px] text-zinc-500">
+                      Cancel is only available before any creator joins.
+                      Refund unlocks 7 days after the campaign ends if no
+                      creators submitted a verified final proof.
+                    </p>
+                  </div>
+                )}
 
               {/* What happens when you join — turns into the live action panel
                   after successful join so the creator always has a visible
