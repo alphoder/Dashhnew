@@ -1,13 +1,16 @@
-# DASHH — Co-Founder Equity & Vesting Agreement
+# DASHH — Co-Founder Equity & Vesting Agreement (ARCHIVED)
 
-> **This is a template, not legal advice.** Get an Indian startup lawyer
-> to review before signing — the cost is ₹3,000–₹10,000 and it saves
-> 10× that in future disputes. Lawyers at the Superteam India network
-> can review for free if you ask.
+> **Status: ARCHIVED — not applicable for solo founder.**
 >
-> Sign this **before** taking any external money (grants, hackathon
-> prizes, NFT mint proceeds) and **before** forming the LLP. The agreement
-> survives LLP formation and informs the LLP partnership deed.
+> This document was drafted when DASHH was planned as a 5-person team.
+> The college viva paperwork retains the 5-name attribution as required
+> for academic records, but DASHH is now operated and owned solely by
+> Vedant Singh going forward.
+>
+> Keep this template in the repo for reference — if you later bring on
+> co-founders, revive this and adapt. Until then, ignore.
+>
+> See `docs/strategy/README.md` for the current solo-builder playbook.
 
 ---
 

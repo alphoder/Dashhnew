@@ -133,41 +133,52 @@ need money and time.
 
 ---
 
-## Founding team
+## Founder
 
-Five-person undergraduate team at Shri Govindram Seksaria Institute of
-Technology and Science (SGSITS), Indore, Madhya Pradesh, India.
+**Vedant Singh** (0801CS231156) — solo builder. Final-year B.Tech
+(Computer Science & Engineering) at Shri Govindram Seksaria Institute
+of Technology and Science (SGSITS), Indore, Madhya Pradesh, India.
+Cohort 2025–26, graduating June 2026.
 
-- **<<Saksham Vyalsa>>** (0801CS231117) — backend + on-chain
-- **<<Sanjeet Kumar>>** (0801CS231122) — frontend + animations
-- **<<Vedant Singh>>** (0801CS231156) — full-stack lead + product
-- **<<Vivek Bharti>>** (0801CS231162) — Reclaim integration
-- **<<Yatharth Urmaliya>>** (0801CS231165) — testing & ops
+Built DASHH end-to-end as a major final-year project: every commit on
+`alphoder/Dashhnew`, every API route, every on-chain integration, every
+test file. Now taking the project independent past graduation to ship
+on mainnet with the funding requested below.
 
-Final-year B.Tech (Computer Science & Engineering) cohort 2025–26.
-Available full-time post-graduation.
+Academic project supervision: **Ms. Ritambhara Patidar** and
+**Ms. Mamta Gupta**, Department of Computer Engineering, SGSITS.
 
-Project guides: **Ms. Ritambhara Patidar** (lead) and **Ms. Mamta Gupta**
-(co-guide), Department of Computer Engineering, SGSITS.
+**Solo-builder advantages relevant to a Foundation grant:**
+- No team-blocking-team coordination. Each milestone is one-person
+  executable.
+- Full ownership of the codebase — zero handover overhead between
+  features.
+- Lower funding ceiling required (no team salary). 100% of the grant
+  goes to shipping, not headcount.
+- Plan to expand to 2–3 hires after the mainnet launch (when there's
+  revenue to support them and a track record to point at).
 
 ---
 
 ## Disclosures
 
-- **No prior funding.** This is the team's first grant application.
+- **No prior funding.** This is my first grant application.
 - **No competing grant accepted yet.** Reclaim Protocol and Superteam
-  India applications submitted in parallel; we'll disclose any awarded.
-- **No equity given up.** The repo is MIT-licensed and IP is held
-  jointly by the 5 founders (LLP formation in progress).
+  India applications submitted in parallel; I'll disclose any awarded.
+- **No equity given up.** The repo is MIT-licensed and IP is held by me
+  personally. Will incorporate as a sole proprietorship initially, then
+  Pvt Ltd if/when revenue or external investment makes that necessary.
 
 ---
 
 ## Contact
 
-- Lead: <<Vedant Singh>> — `<<lead-founder@example.com>>` —
-  `<<@yourhandle on X>>`
+- Name: **Vedant Singh**
+- Email: `<<your-email@example.com>>`
+- Twitter: `<<@yourhandle>>`
 - GitHub: <https://github.com/alphoder/Dashhnew>
 - Live demo: <https://dashhnew.vercel.app>
+- Solana wallet (grant receive): `<<dedicated-DASHH-treasury-wallet>>`
 
 ---
 

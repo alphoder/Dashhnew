@@ -18,19 +18,19 @@ DASHH lets brands escrow ad budgets on Solana and pay creators only for
 views that Reclaim Protocol cryptographically proves are real, eliminating
 the $1.4B/year fake-engagement problem in influencer marketing.
 
-## 3. Team
+## 3. Builder
 
-Five-person undergraduate engineering team at Shri Govindram Seksaria
-Institute of Technology and Science (SGSITS), Indore, India:
+**Vedant Singh** — solo founder. Final-year B.Tech (Computer Science &
+Engineering) at Shri Govindram Seksaria Institute of Technology and
+Science (SGSITS), Indore, India. Built DASHH end-to-end over 6+ months:
+the Solana integration, the four Reclaim platform adapters, the
+13-rule disqualification pipeline, the two-proof settlement runner,
+and every line of the frontend.
 
-- **<<Saksham Vyalsa>>** — backend + on-chain
-- **<<Sanjeet Kumar>>** — frontend + animations
-- **<<Vedant Singh>>** — full-stack lead + product
-- **<<Vivek Bharti>>** — Reclaim integration + verifier pipeline
-- **<<Yatharth Urmaliya>>** — testing + documentation
-
-GitHub: <https://github.com/alphoder/Dashhnew>
-Live: <https://dashhnew.vercel.app>
+- GitHub: <https://github.com/alphoder/Dashhnew>
+- Live: <https://dashhnew.vercel.app>
+- Twitter: `<<@yourhandle>>`
+- Available full-time on DASHH post-graduation (June 2026)
 
 ## 4. The problem we're solving
 
@@ -105,7 +105,7 @@ Code at `src/lib/settlement.ts` and `src/lib/payouts.ts`. Tested in
 | **End-to-end demo video** featuring Reclaim as the trust anchor | 1 week | Promotes Reclaim in marketing |
 | **Audited Anchor escrow** integration that releases payouts only on Reclaim verifier signatures | 3–4 weeks | Yes — first production Solana protocol fronting Reclaim verifier sigs |
 
-Total scope: 8–10 weeks of focused work for the 5-person team.
+Total scope: 8–10 weeks of focused solo work post-graduation (June 2026 onwards). I can ship faster than a team here because the existing codebase is in my head end-to-end — no handover overhead.
 
 ## 9. Funding ask
 
@@ -129,23 +129,26 @@ Total scope: 8–10 weeks of focused work for the 5-person team.
 - **Feedback loop** — bug reports + provider suggestions from real
   end-user traffic, formalised as GitHub issues in the Reclaim repos.
 
-## 11. Why us, why now
+## 11. Why me, why now
 
-- We're a **5-person team** with a **shipped product on production
-  infrastructure** — not a 1-person prototype.
-- Reclaim is already the **backbone** of our verification layer — we
-  cannot ship without it. The grant accelerates work we're going to do
-  regardless.
+- **Solo founder with a shipped product** — most Reclaim integrations are
+  weekend demos. DASHH is a 17k+ LOC production app with 45 passing tests,
+  a deployed v2 schema, and live infrastructure. The cost of saying "yes"
+  on this grant is low because the engineering risk is already behind us.
+- Reclaim is the **backbone** of my verification layer — I cannot ship
+  without it. The grant accelerates work I'm going to do regardless.
 - The **two-proof model is genuinely novel** — single-proof systems
-  dominate the space. Reclaim's documentation can cite us as a flagship
-  use case once we ship.
-- We're based in **India**, where micro-influencer marketing is one of
-  the fastest-growing creator-economy segments globally. Reclaim's
-  geographic ecosystem footprint expands with our adoption.
+  dominate the space. Reclaim's docs can cite DASHH as a flagship use case.
+- **India + emerging-markets micro-influencer marketing** is one of the
+  fastest-growing creator-economy segments globally. Reclaim's geographic
+  ecosystem footprint expands with DASHH's adoption.
+- Solo means **fast** — no consensus overhead, no team-blocking-team
+  patterns. Every milestone above is one-person executable.
 
 ## 12. Contact
 
-- Email: `<<lead-founder@example.com>>`
+- Name: **Vedant Singh**
+- Email: `<<your-email@example.com>>`
 - Twitter: `<<@yourhandle>>`
 - GitHub: alphoder/Dashhnew
 - Live demo: <https://dashhnew.vercel.app>

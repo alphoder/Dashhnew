@@ -16,15 +16,11 @@ for views that Reclaim Protocol cryptographically proves are real.
 **Live:** <https://dashhnew.vercel.app>
 **GitHub:** <https://github.com/alphoder/Dashhnew>
 
-## The team
+## The builder
 
-Five undergrads at SGSITS Indore. India-based. Building in public.
-
-- <<Saksham Vyalsa>> — backend
-- <<Sanjeet Kumar>> — frontend
-- <<Vedant Singh>> — full-stack lead
-- <<Vivek Bharti>> — verification pipeline
-- <<Yatharth Urmaliya>> — testing & docs
+**Vedant Singh** — solo founder. Final-year B.Tech CSE at SGSITS Indore.
+India-based, building DASHH in public. Built every line of the codebase
+end-to-end over 6+ months. Available full-time on DASHH after June 2026.
 
 ## Why this matters for Solana India
 
@@ -114,10 +110,12 @@ Each milestone closed with a public Twitter thread + screen-recording.
 
 ## Contact
 
-- Email: `<<lead-founder@example.com>>`
+- Name: **Vedant Singh**
+- Email: `<<your-email@example.com>>`
 - Twitter: `<<@yourhandle>>`
 - Discord: `<<discord-handle>>`
 - Telegram: `<<@telegramhandle>>`
+- Solana wallet (USDC receive): `<<dedicated-DASHH-treasury-wallet>>`
 
 ---
 

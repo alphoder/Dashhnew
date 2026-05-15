@@ -154,9 +154,26 @@ Per-NFT metadata JSON includes:
 
 ### Treasury wallet
 
-A 3-of-5 Squads multisig of the five founder wallets. Mint proceeds
-deposit directly here. Disbursement to founders is governance-voted
-(documented separately).
+DASHH is solo-operated, so the multi-founder Squads model in earlier
+drafts of this doc doesn't apply. Two safer alternatives:
+
+- **Recommended (medium risk, simple):** A new dedicated Phantom
+  wallet labelled `DASHH Treasury`, separate from the operator's
+  everyday wallet. Mint proceeds land here. Limit hot exposure by
+  sweeping balances above ~5 SOL into a hardware wallet (Ledger,
+  Tangem) weekly.
+
+- **Better (low risk, ~30 min setup):** A 2-of-3 Squads multisig where
+  the operator holds 2 keys (one in Phantom hot, one in a Ledger cold
+  wallet) and a trusted third party (family member, lawyer, advisor)
+  holds the 3rd recovery key. Any withdrawal needs 2 signatures —
+  protects against single-device compromise without forcing a
+  cofounder structure.
+
+Disbursement: solo operator decides. No vote needed. Keep a public
+log of NFT-mint-revenue spending in `docs/finances.md` (private to
+repo collaborators) so future co-investors / Pvt Ltd auditors have a
+clean trail.
 
 ---
 
@@ -183,13 +200,15 @@ launches on Day 56, i.e., 4 weeks after Twitter sprint completes.)
 - [ ] Twitter following ≥ 300 quality followers
 - [ ] Discord ≥ 100 members with an active conversation
 - [ ] One real-brand case study live on /case-studies
-- [ ] LLP formed + business bank account opened
+- [ ] Sole-proprietorship registration OR Pvt Ltd in your name (so
+      revenue can be received cleanly with FIRC compliance)
 - [ ] Lawyer review of utility language (recommend Indian crypto-securities
       counsel)
 - [ ] Magic Eden Launchpad pre-approval received
 - [ ] Audited Anchor escrow live on mainnet (P2.1) — so the fee-discount
       utility is enforceable on-chain, not just promised
-- [ ] Squads multisig live as treasury wallet
+- [ ] 2-of-3 Squads multisig live as treasury wallet (or dedicated cold
+      wallet at minimum)
 - [ ] First three holders' fee discounts manually tested on devnet end-
       to-end before public mint
 
@@ -210,14 +229,28 @@ Twitter sprint.
 
 ---
 
-## Tax (India-specific)
+## Tax (India-specific, solo)
 
-Every NFT sale is a VDA transaction. For the buyer: 30% on gain (held >
-month). For us: gain on sale = price received minus mint cost (negligible).
+Every NFT sale is a VDA transaction. For the buyer: 30% on gain. For
+DASHH: gain on sale = price received minus mint cost (negligible —
+Metaplex Core mints cost ~$0.001 each), so taxable gain ≈ full revenue.
 
-The full mint revenue is income to whichever entity holds the
-multisig — LLP if formed, otherwise the lead founder as professional
-income. **Form the LLP before mint.**
+Two routing options for the mint revenue:
+
+- **Personal income** (recommended for first year): mint revenue lands
+  in your personal Solana wallet; when converted to INR via P2P, it's
+  professional income on your personal ITR. Effective tax rate as a
+  student with no other income is likely 0–10%. File ITR-4 (presumptive
+  income for professionals) — simple.
+
+- **Sole proprietorship** (if revenue > ₹5L/year): cleaner audit trail.
+  Open a current account in your name as "<<Vedant Singh>>, sole
+  proprietor of DASHH." Get a CA. Optional GST registration if revenue
+  > ₹20L/year.
+
+**Do NOT** convert NFT mint revenue immediately — wait until you actually
+need the cash. Holding USDC reduces tax events and lets you spend
+crypto-native (RPC fees, audit fees, etc.) without conversion at all.
 
 ---
 
