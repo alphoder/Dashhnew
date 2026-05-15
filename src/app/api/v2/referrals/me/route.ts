@@ -34,11 +34,31 @@ export async function GET(req: Request) {
 
     const db = getDb();
 
-    // Everyone whose `referredBy` is this wallet
-    const referredProfiles = await db
-      .select()
-      .from(schema.profiles)
-      .where(eq(schema.profiles.referredBy, wallet));
+    // Everyone whose `referredBy` is this wallet. Wrapped in try/catch
+    // because the column was added in P3.2 and may not have been pushed
+    // to the live DB yet — until `npx drizzle-kit push` runs, the column
+    // doesn't exist and Postgres will error. We swallow it and return
+    // zeros so the dashboard never breaks.
+    let referredProfiles: Array<typeof schema.profiles.$inferSelect> = [];
+    try {
+      referredProfiles = await db
+        .select()
+        .from(schema.profiles)
+        .where(eq(schema.profiles.referredBy, wallet));
+    } catch (err) {
+      console.warn(
+        '[referrals/me] referredBy column missing — schema needs push',
+        err,
+      );
+      return NextResponse.json({
+        wallet,
+        referredCount: 0,
+        bonusesEarned: 0,
+        totalBonusesPaid: 0,
+        referredCreators: [],
+        schemaMigrationPending: true,
+      });
+    }
 
     const bonusesEarned = referredProfiles.reduce(
       (sum, p) => sum + ((p as any).referralBonusesEarned ?? 0),
