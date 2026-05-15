@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Copy, LogOut, Check } from 'lucide-react';
 
 interface ConnectPhantomWalletProps {
   walletAddress: string | null;
@@ -31,8 +32,20 @@ export default function ConnectPhantomWallet({
   setWalletAddress,
 }: ConnectPhantomWalletProps) {
   const [isClient, setIsClient] = useState(false);
+  const [copied, setCopied] = useState(false);
   const router = useRouter();
   const isConnected = !!walletAddress;
+
+  async function copyAddress() {
+    if (!walletAddress) return;
+    try {
+      await navigator.clipboard.writeText(walletAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard API can fail in iframes — ignore */
+    }
+  }
 
   // Hydrate from localStorage + try a silent reconnect
   useEffect(() => {
@@ -161,32 +174,41 @@ export default function ConnectPhantomWallet({
           `}</style>
         </button>
       ) : isClient ? (
-        <button
-          onClick={() => {
-            disconnect();
-            router.push('/');
-          }}
-          title={walletAddress ?? ''}
-          className="relative overflow-hidden rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 text-white shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full"
-        >
-          {walletAddress
-            ? `${walletAddress.slice(0, 4)}…${walletAddress.slice(-4)}`
-            : 'Logout'}
-          <div className="absolute inset-0 -translate-x-full animate-slide bg-gradient-to-r from-transparent via-white to-transparent opacity-50"></div>
-          <style jsx>{`
-            @keyframes slide {
-              0% {
-                transform: translateX(-100%);
-              }
-              100% {
-                transform: translateX(100%);
-              }
+        <div className="inline-flex items-stretch overflow-hidden rounded-lg border border-white/10 bg-black/40 text-sm">
+          {/* Address pill — clicking copies the full address. */}
+          <button
+            type="button"
+            onClick={copyAddress}
+            title={
+              copied
+                ? 'Copied!'
+                : `Click to copy · ${walletAddress ?? ''}`
             }
-            .animate-slide {
-              animation: slide 2s infinite;
-            }
-          `}</style>
-        </button>
+            className="flex items-center gap-1.5 px-3 py-2 font-mono text-xs text-white hover:bg-white/5"
+          >
+            {copied ? (
+              <Check className="h-3.5 w-3.5 text-[#14F195]" />
+            ) : (
+              <Copy className="h-3.5 w-3.5 text-zinc-400" />
+            )}
+            {walletAddress
+              ? `${walletAddress.slice(0, 4)}…${walletAddress.slice(-4)}`
+              : ''}
+          </button>
+          {/* Dedicated disconnect button — distinct so it's obvious how to leave. */}
+          <button
+            type="button"
+            onClick={() => {
+              disconnect();
+              router.push('/');
+            }}
+            title="Disconnect wallet"
+            aria-label="Disconnect wallet"
+            className="border-l border-white/10 px-3 text-zinc-400 hover:bg-red-500/10 hover:text-red-400"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
       ) : null}
     </main>
   );
