@@ -16,17 +16,25 @@ const Header = () => {
   const pathname = usePathname();
   const inApp = isAppRoute(pathname);
 
+  // Keep localStorage in sync with the in-memory wallet state. When the
+  // address goes from non-null to null (user clicked Logout, or Phantom
+  // fired `disconnect`), we clear the cache so reloads don't resurrect a
+  // dead session.
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     if (walletAddress) {
       window.localStorage.setItem('dashh_wallet', walletAddress);
     }
+    // NOTE: we intentionally don't auto-clear on null here because the
+    // connect button's `disconnect()` handler does that — clearing on
+    // every null transition would race with the silent-reconnect path.
   }, [walletAddress]);
 
+  // Hydrate from localStorage on first mount so the header doesn't flash
+  // empty between SSR and the connect-button's silent reconnect.
   useEffect(() => {
-    const stored =
-      typeof window !== 'undefined'
-        ? window.localStorage.getItem('dashh_wallet')
-        : null;
+    if (typeof window === 'undefined') return;
+    const stored = window.localStorage.getItem('dashh_wallet');
     if (stored && !walletAddress) setWalletAddress(stored);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
