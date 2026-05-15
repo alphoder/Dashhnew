@@ -85,10 +85,24 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Legal row — a thin band of policy links beneath the column grid.
-            Kept separate so it never competes for attention with the main
-            product navigation above. */}
+        {/* Legal row — a thin band of policy + contact links beneath the
+            column grid. Kept separate so it never competes for attention
+            with the main product navigation above. */}
         <nav className="mb-4 mt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-white/5 pt-6 text-xs text-zinc-500">
+          <Link
+            href="/contact"
+            className="text-[#14F195] hover:text-white transition-colors"
+          >
+            Connect with us
+          </Link>
+          <span className="text-zinc-700">·</span>
+          <a
+            href="mailto:vedant1609singh@gmail.com"
+            className="hover:text-white transition-colors"
+          >
+            vedant1609singh@gmail.com
+          </a>
+          <span className="text-zinc-700">·</span>
           <Link
             href="/legal/privacy"
             className="hover:text-white transition-colors"

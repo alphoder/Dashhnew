@@ -4,7 +4,9 @@
 > [@SuperteamIN on X](https://x.com/SuperteamIN) for a project grant.
 >
 > Replace anything in `<<angle brackets>>` and paste. Expected response:
-> 1–2 weeks for bounties, 4–6 weeks for grants. Realistic ask: **$1,500–$5,000**.
+> 1–2 weeks for bounties, 4–6 weeks for grants. Realistic ask: **$3,000–$10,000**
+> (Superteam India's project grants for shipped-product solo builders
+> regularly hit the $7.5–$10k range when there's a clean roadmap).
 
 ---
 
@@ -56,35 +58,39 @@ end-to-end over 6+ months. Available full-time on DASHH after June 2026.
 
 Three options depending on bounty / grant size:
 
-### Option A: $1,500 — Single bounty deliverable
+### Option A: $3,000 — Single deliverable
 
-Pick one and we'll ship it as a bounty:
+Pick one and I'll ship it:
 
 - **Native referral leaderboard with on-chain reputation NFTs** —
   earn a non-transferable NFT for every successful campaign, with
   tier upgrades at thresholds.
 - **Solana Pay integration** — brands can fund campaigns via Solana
   Pay QR codes instead of in-app wallet flows.
-- **Spanish / Hindi / Mandarin localisation** — full i18n for the
-  landing + dashboards + docs.
+- **Hindi + Spanish localisation** — full i18n for the landing,
+  dashboards, and docs, unlocking the two largest non-English
+  creator-economy populations.
 
-### Option B: $3,000 — Mid-tier grant
+### Option B: $6,000 — Mid-tier grant
 
 Two of the above, plus:
 
-- **First settled case study with a real Indian brand** — we'll
-  recruit one design-partner (local cafe / sneaker / fitness studio)
-  and run a real campaign with 0.5 SOL escrow, then publish the
-  results as a case study with on-chain proof of every payment.
+- **First settled case study with a real Indian brand** — recruit
+  one design-partner (local cafe / sneaker / fitness studio) and run
+  a real campaign with 0.5 SOL escrow, then publish the results as a
+  case study with on-chain proof of every payment.
 
-### Option C: $5,000 — Full project grant
+### Option C: $10,000 — Full project grant
 
 All of the above, plus:
 
 - **Audited Anchor escrow** — the P2.1 multi-week deliverable from
-  our production roadmap (`docs/PRODUCTION_ROADMAP.md`).
-- **Mainnet launch** with a 3-of-5 Squads multisig as the platform
+  the production roadmap (`docs/PRODUCTION_ROADMAP.md`). Bulk of the
+  funds go to the audit fee from a reputable firm (OtterSec / Sec3).
+- **Mainnet launch** with a Squads 2-of-3 multisig as the platform
   recipient.
+- **5 design-partner case studies** instead of 1, demonstrating
+  Indian-market product-market fit.
 
 ## Milestones
 

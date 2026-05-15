@@ -3,9 +3,9 @@
 > Submit at: <https://solana.org/grants>
 >
 > Solana Foundation grants are larger and slower than Reclaim or Superteam.
-> Expected response: 6–12 weeks. Realistic ask: **$15,000–$50,000** for
-> early-stage builder, more for established teams. Submit ONLY after
-> Reclaim + Superteam are in (gives traction signal).
+> Expected response: 6–12 weeks. Realistic ask: **$50,000** for a
+> shipped solo-builder product with a clear mainnet runway. Submit ONLY
+> after Reclaim + Superteam are in (gives traction signal).
 
 ---
 
@@ -95,22 +95,35 @@ need money and time.
 | **Builder-facing surface** — open the API for third-party dashboards (Helius templates, Magic Eden integration, etc.) | 1 | Dev time + docs |
 | **Co-marketing tour** — talks at Solana India events, Indian university chapters, technical blog posts | 1 | Travel + content production |
 
-**Total scope:** ~6 months of focused team effort.
+**Total scope:** ~6 months of focused solo work post-graduation.
 
-**Total ask:** $25,000 USDC.
+**Total ask:** $50,000 USDC.
+
+The number isn't picked from thin air. Defensible line items:
+
+| Line item | Sub-amount |
+| --- | --- |
+| Anchor escrow audit (OtterSec, Sec3, or Halborn) | $12–18k |
+| 6 months runway for solo full-time work in Indore (~₹50k/month) | $4k |
+| Design-partner subsidy (10 brands × ₹4–8k of platform-fee credits) | $7k |
+| Mainnet deploy fees + hot-wallet refills + RPC credits (Helius Pro) | $3k |
+| Co-marketing travel + content production (1 Solana India event, 1 Mumbai meetup, video content) | $4k |
+| Buffer for unexpected items (legal review, additional infra, etc.) | $14–20k |
 
 ### Milestones
 
-1. **M1 ($5k @ award)** — Anchor program design + draft submitted for
-   audit. Squads multisig live on mainnet for the platform wallet.
-2. **M2 ($5k @ month 2)** — Audit passed. Mainnet live. First 3
+1. **M1 ($10k @ award)** — Anchor program design + audit submitted.
+   Squads multisig live. First design-partner brand recruited.
+2. **M2 ($10k @ month 2)** — Audit passed. Mainnet live. First 3
    design-partner campaigns funded.
-3. **M3 ($5k @ month 4)** — 10 design-partner case studies published.
-   Public API documented at /docs/api.
-4. **M4 ($5k @ month 5)** — 3 third-party integrations live (Helius,
+3. **M3 ($10k @ month 4)** — 10 design-partner case studies published.
+   Public API documented at /docs/api. First 3 hires onboarded if
+   revenue supports it.
+4. **M4 ($10k @ month 5)** — 3 third-party integrations live (Helius,
    Magic Eden, Tensor) — verified by their teams.
-5. **M5 ($5k @ month 6)** — Co-marketing tour complete. Final report
-   with platform-fee revenue numbers + creator-payout volume.
+5. **M5 ($10k @ month 6)** — Co-marketing tour complete. Final report
+   with platform-fee revenue numbers + creator-payout volume +
+   handover plan if continuing on revenue alone.
 
 ---
 

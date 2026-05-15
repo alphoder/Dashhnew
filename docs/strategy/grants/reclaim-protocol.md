@@ -4,7 +4,9 @@
 > [@reclaimprotocol on X](https://x.com/reclaimprotocol))
 >
 > Read this top to bottom, replace anything in `<<angle brackets>>`, and
-> paste. Expected response time: 2–4 weeks. Realistic ask: **$5,000–$10,000**.
+> paste. Expected response time: 2–4 weeks. Realistic ask: **$15,000–$25,000**
+> (Reclaim funds flagship integrations at the higher end of their range
+> when the integration already ships in production).
 
 ---
 
@@ -109,12 +111,19 @@ Total scope: 8–10 weeks of focused solo work post-graduation (June 2026 onward
 
 ## 9. Funding ask
 
-**$5,000–$10,000** in USDC, milestoned:
+**$15,000–$25,000** in USDC, milestoned across the 5 workstreams above:
 
-- $2,000 on grant award — kicks off the additional-providers work
-- $3,000 on shipping the new providers + fallback chain (Milestone 1)
-- $3,000 on shipping the proof browser + demo video (Milestone 2)
-- $2,000 on mainnet launch with the audited escrow (Milestone 3)
+- $4,000 on grant award — kicks off the additional-providers work
+- $5,000 on shipping the new providers + fallback chain (Milestone 1)
+- $4,000 on shipping the proof browser + demo video (Milestone 2)
+- $6,000 on mainnet launch with the audited escrow (Milestone 3)
+- $6,000 reserved for the audit fee itself + post-audit hardening (Milestone 4)
+
+**Why this number:** the Anchor escrow audit alone runs $5k–$15k from
+OtterSec, Halborn, or Sec3 even at solo-builder rates. The other workstreams
+each represent 1–4 weeks of full-time post-graduation work at conservative
+solo rates. The number is defensible against any line item — happy to drop
+any workstream if it brings the ask down to your standard range.
 
 ## 10. What we'll commit to in return
 

@@ -1,268 +1,205 @@
 # DASHH
 
-> Peer-to-peer, zkTLS-verified influencer engagement, settled on Solana.
-> No middlemen. No admin. No fake views.
+> Peer-to-peer, zkTLS-verified influencer marketing settled on Solana.
+> No middlemen. No admins. No fake views.
 
-[![CI](https://github.com/alphoder/Dashhnew/actions/workflows/ci.yml/badge.svg)](https://github.com/alphoder/Dashhnew/actions)
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
-![Solana](https://img.shields.io/badge/Solana-Devnet-9945FF)
-![Reclaim](https://img.shields.io/badge/Reclaim-zkTLS-14F195)
+![Status: Devnet, mainnet-pending](https://img.shields.io/badge/Status-Solana%20Devnet-9945FF?style=flat-square)
+![Stack: Next.js 14 + TypeScript](https://img.shields.io/badge/Stack-Next.js%2014%20%2B%20TS-000?style=flat-square&logo=next.js)
+![Solana: Devnet](https://img.shields.io/badge/Solana-Devnet-14F195?style=flat-square&logo=solana&logoColor=000)
+![Reclaim: 4 platforms](https://img.shields.io/badge/Reclaim-zkTLS-9945FF?style=flat-square)
+![Tests: 45 passing](https://img.shields.io/badge/Tests-45%20passing-14F195?style=flat-square)
+![Builder: Solo](https://img.shields.io/badge/Builder-Solo-zinc?style=flat-square)
 
-DASHH connects brands directly with creators. A brand escrows SOL, creators post
-content on social platforms, zkTLS proofs verify the views, and the smart
-routing layer pays creators out — all without a platform sitting in the middle
-of the money.
+DASHH is a decentralised advertising platform that connects brands
+directly to creators using **Reclaim Protocol's zkTLS proofs** for
+real-time engagement verification and **Solana** for instant on-chain
+settlement. Brands escrow their budget, creators post content and submit
+cryptographic proofs of their views, and the platform pays out only the
+verified delta — no platform-reported metrics, no manual reconciliation,
+no fraud surface.
 
----
-
-## Table of contents
-
-- [What makes it different](#what-makes-it-different)
-- [The two-proof settlement model](#the-two-proof-settlement-model)
-- [Stack](#stack)
-- [Getting started](#getting-started)
-- [Environment variables](#environment-variables)
-- [Scripts](#scripts)
-- [Project structure](#project-structure)
-- [Payout models](#payout-models)
-- [Disqualification rules](#disqualification-rules)
-- [Testing](#testing)
-- [Deployment](#deployment)
-- [Docs](#docs)
-- [License](#license)
+**Live:** <https://dashhnew.vercel.app>
+**Builder:** Vedant Singh ([@dashhhee](https://x.com/dashhhee) ·
+[vedant1609singh@gmail.com](mailto:vedant1609singh@gmail.com))
 
 ---
 
-## What makes it different
+## What's inside
 
-| Problem with legacy influencer platforms | DASHH's answer |
-| --- | --- |
-| Fake views inflate payouts | zkTLS proofs pulled directly from the platform, not screenshots |
-| Platforms take 20–40% and hold funds | 20% fee signed into the terms, on-chain escrow, no custody |
-| Admins mediate disputes subjectively | 13 deterministic disqualification rules, baked into code |
-| Creators re-submit proofs, risk double-pay | Delta-aware payout math — paid once for each new view |
-| Brand/creator trust drift over time | Two proofs per campaign: a join proof and a final-window proof |
-
----
-
-## The two-proof settlement model
-
-Every campaign has exactly **two proof checkpoints per creator**, and payouts
-only settle once both land:
-
-1. **Join proof** — at the moment the creator joins the campaign, they prove
-   ownership of the social account via Reclaim's zkTLS provider. This locks the
-   baseline metrics (views, follower count, caption content).
-2. **Final proof** — during a **7-day window after the campaign ends**, the
-   creator returns and submits a second proof. This captures the final state.
-
-The difference between the two proofs is what gets paid. Any creator who
-doesn't return inside the window is auto-disqualified and their share rolls
-back into the residual pool. No human decides — the code does.
-
-See `src/lib/settlement.ts` and `src/lib/payouts.ts`.
+- 🔐 **Sign-In With Solana (SIWS)** with HMAC-signed JWT cookies
+- ⚡️ **22+ versioned REST endpoints** under `/api/v2/*` with Zod
+  validation and per-wallet + per-IP rate limiting
+- 🧠 **Two-proof settlement model** — Join Proof + Final Proof in a
+  7-day window, with delta-aware payout math
+- 🚫 **13-rule disqualification pipeline** + 3-strike ban policy,
+  fully deterministic
+- 💸 **Four payment models** — per-view, top-performer, split-top-N,
+  equal-split
+- 🪞 **Brand auto-refund** when no creator submits a final proof
+- 📜 **Solana Actions / Blinks** support for sharing campaigns outside
+  the app
+- 🧾 **Arweave anchoring** of every verified proof for permanent audit
+- 📊 Live brand + creator dashboards, public case studies, FAQ, docs
+- 🛡️ **Sentry, PostHog, Cloudflare Turnstile, kill-switch** all wired
+  (gated by env vars — no-op until configured)
 
 ---
 
-## Stack
-
-- **Framework** — Next.js 14 (App Router, Route Groups, Server Actions)
-- **Language** — TypeScript end-to-end
-- **DB** — Neon Postgres + Drizzle ORM (serverless)
-- **Auth** — Sign-In With Solana (SIWS) + HMAC-signed JWT cookies
-- **Chain** — Solana Web3.js, Phantom Wallet, Solana Actions / Blinks
-- **Verification** — Reclaim Protocol zkTLS (Instagram, YouTube, X, TikTok)
-- **Storage** — Arweave / Irys for permanent proof bundles
-- **UI** — Tailwind CSS, shadcn/ui, Framer Motion
-- **Validation** — Zod schemas at every API boundary
-- **Testing** — Vitest (45 tests across 6 files)
-- **CI/CD** — GitHub Actions, Vercel, Vercel Cron
-
----
-
-## Getting started
+## Quick start
 
 ```bash
-# 1. Clone
-git clone https://github.com/alphoder/Dashhnew.git
-cd Dashhnew
-
-# 2. Install
+git clone <this repo>          # private — accept the invite first
+cd major-project-
 npm install
-
-# 3. Configure secrets
-cp .env.example .env
-# fill in DATABASE_URL, SIWS_SESSION_SECRET, Reclaim IDs, Solana recipient, etc.
-
-# 4. Push schema + seed
-npx drizzle-kit push
-node scripts/seed.mjs
-
-# 5. Run
-npm run dev
+cp .env.example .env           # fill in DATABASE_URL + Reclaim keys
+npx drizzle-kit push           # set up the schema in Neon
+npm run dev                    # → http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000). You need Phantom on
-**Devnet** and some devnet SOL to test the full flow.
+Required env vars (see `.env.example` for the full list):
 
----
+```
+DATABASE_URL                                   # Neon Postgres
+SIWS_SESSION_SECRET                            # 32-byte hex
+NEXT_PUBLIC_APP_URL                            # public URL
+NEXT_PUBLIC_SOLANA_CLUSTER                     # devnet | mainnet-beta
+NEXT_PUBLIC_SOLANA_RPC                         # RPC endpoint
+SOLANA_RECIPIENT_ADDRESS                       # platform wallet
+NEXT_PUBLIC_RECLAIM_APP_ID
+NEXT_PUBLIC_RECLAIM_APP_SECRET
+NEXT_PUBLIC_RECLAIM_PROVIDER_ID_INSTAGRAM
+NEXT_PUBLIC_RECLAIM_PROVIDER_ID_YOUTUBE
+NEXT_PUBLIC_RECLAIM_PROVIDER_ID_TWITTER
+NEXT_PUBLIC_RECLAIM_PROVIDER_ID_TIKTOK
+```
 
-## Environment variables
+Optional but recommended for production:
 
-See `.env.example` for the full list. The critical ones:
-
-| Key | Purpose |
-| --- | --- |
-| `DATABASE_URL` | Neon Postgres connection string (pooled) |
-| `SIWS_SESSION_SECRET` | 32+ char secret for signing auth cookies |
-| `NEXT_PUBLIC_APP_URL` | Public URL, used by Solana Actions metadata |
-| `NEXT_PUBLIC_SOLANA_CLUSTER` | `devnet` or `mainnet-beta` |
-| `NEXT_PUBLIC_SOLANA_RPC` | RPC endpoint |
-| `SOLANA_RECIPIENT_ADDRESS` | Platform-fee receiver |
-| `NEXT_PUBLIC_RECLAIM_APP_ID` / `_APP_SECRET` | Reclaim app credentials |
-| `NEXT_PUBLIC_RECLAIM_PROVIDER_ID_{INSTAGRAM,YOUTUBE,TWITTER,TIKTOK}` | Per-platform zkTLS providers |
-| `IRYS_PRIVATE_KEY` | Optional — Arweave uploader key |
-
----
-
-## Scripts
-
-```bash
-npm run dev           # Next.js dev server
-npm run build         # Production build
-npm run start         # Production server
-npm run lint          # ESLint
-npm run typecheck     # tsc --noEmit
-npm run test          # Vitest
-npx drizzle-kit push  # Sync schema to Neon
-node scripts/seed.mjs # Idempotent seed (8 campaigns, 5 creators, 23 proofs)
+```
+PLATFORM_SIGNING_KEY                           # base58 secret key for payouts
+CRON_SECRET                                    # gates /api/v2/settle
+NEXT_PUBLIC_SENTRY_DSN                         # error monitoring
+NEXT_PUBLIC_POSTHOG_KEY                        # analytics
+TURNSTILE_SECRET                               # CAPTCHA on form
+DASHH_KILL_SWITCH=true                         # halt all writes (operational)
 ```
 
 ---
 
-## Project structure
+## Architecture
 
 ```
 src/
 ├─ app/
-│  ├─ (app)/                 # Authenticated app shell — dashboard, discover,
-│  │                         # leaderboard, form, analytics, creatordashboard
+│  ├─ (app)/                  # authenticated app shell — sidebar + mode toggle
+│  │  ├─ analytics/           # brand analytics dashboard
+│  │  ├─ creatordashboard/    # brand-side dashboard (legacy v1)
+│  │  ├─ dashboard/           # creator-side earnings (v2)
+│  │  ├─ discover/            # campaign browse + verified-brands filter
+│  │  ├─ form/                # campaign create (template picker + payment model)
+│  │  ├─ leaderboard/         # top creators
+│  │  ├─ notifications/       # in-app notification feed
+│  │  ├─ onboarding/          # 4-step wizard
+│  │  └─ terms/               # T&C + disqualification rules
 │  ├─ api/
-│  │  ├─ v2/                 # v2 endpoints: campaigns, proofs, settle, sync
-│  │  ├─ auth/               # SIWS nonce + verify
-│  │  └─ ...                 # legacy Solana Action endpoints
-│  ├─ how-it-works/          # Public flow walkthrough
-│  └─ page.tsx               # Landing page
+│  │  ├─ auth/                # SIWS nonce / verify / me / logout
+│  │  ├─ donate/[id]/         # Solana Actions / Blinks endpoint
+│  │  └─ v2/                  # canonical product API
+│  │     ├─ analytics/
+│  │     ├─ campaigns/
+│  │     │   └─ [id]/{participate,cancel,refund,leaderboard}/
+│  │     ├─ creators/me/
+│  │     ├─ notifications/
+│  │     ├─ proofs/
+│  │     ├─ referrals/me/
+│  │     ├─ settle/           # cron-driven settlement runner
+│  │     └─ sync/             # public-API view-count poll
+│  ├─ case-studies/           # public case study pages
+│  ├─ docs/                   # lightweight docs site
+│  ├─ embed/campaign/[id]/    # iframe-able campaign widget
+│  ├─ invoice/[campaignId]/   # print-friendly brand invoice
+│  ├─ legal/                  # Privacy / Terms / Cookies
+│  ├─ og/                     # dynamic Open Graph image generator
+│  └─ verifyClaim/[uid]/      # Reclaim zkTLS proof submission UI
 ├─ components/
-│  ├─ motion/                # FadeIn, Stagger, CountUp, HoverLift, ModeTransition
-│  ├─ app-sidebar.tsx        # Mode-aware sidebar
-│  └─ ...
-├─ lib/
-│  ├─ modes.ts               # Explore / Create mode — single source of truth
-│  ├─ settlement.ts          # Two-proof routing + final-window logic
-│  ├─ payouts.ts             # Delta-aware payout math, 4 payment models
-│  ├─ terms.ts               # Signed T&C, ban policy, disqualification list
-│  ├─ reclaim/               # Multi-platform zkTLS adapters + verifier
-│  ├─ solana/                # Web3 helpers
-│  ├─ auth/                  # SIWS cookie session
-│  └─ db/                    # Drizzle schema + client
-├─ hooks/
-└─ tests/                    # Vitest suites
-docs/
-├─ PROJECT.md                # Full architecture doc
-├─ VIVA_PREP.md / .pdf       # Viva prep pack (90 Q&As across 5 partitions)
-scripts/
-├─ seed.mjs                  # Neon seeder
-└─ viva-to-pdf.py            # Markdown → styled PDF
+│  ├─ landing/                # LiveMetrics, CompareTable, FAQ
+│  ├─ motion/                 # FadeIn, Stagger, CountUp, HoverLift
+│  └─ ui/                     # Skeleton, EmptyState, ErrorState, StatCard, ...
+└─ lib/
+   ├─ auth/session.ts         # SIWS HMAC session
+   ├─ db/                     # Drizzle schemas (v1 + v2)
+   ├─ reclaim/                # zkTLS adapters + 13-rule verify
+   ├─ solana/escrow.ts        # SystemProgram.transfer + signing
+   ├─ blink-url.ts            # deployment-agnostic Blink URL builder
+   ├─ captcha.ts              # Cloudflare Turnstile verify
+   ├─ kill-switch.ts          # operational halt-all-writes
+   ├─ modes.ts                # Explore / Create — single source of truth
+   ├─ payouts.ts              # computePayoutForProof — 4 models
+   ├─ posthog.ts              # consent-gated analytics
+   ├─ ratelimit.ts            # token-bucket + LIMITS + walletKey()
+   ├─ settlement.ts           # routeProofByWindow, readyToSettle
+   └─ terms.ts                # signed T&C + 13 disqualification rules
 ```
 
----
-
-## Payout models
-
-Configured per campaign:
-
-- **`per_view`** — flat rate × verified view delta.
-- **`top_performer`** — winner-takes-all above a floor.
-- **`split_top_n`** — prize pool split across top N by views.
-- **`equal_split`** — fixed per-creator share.
-
-All four route through the same `computePayoutForProof()` so double-submission
-can never double-pay.
+Database tables (all `_v2` suffixed): `profiles_v2`, `campaigns_v2`,
+`participations_v2`, `proofs_v2`, `payouts_v2`, `notifications_v2`.
 
 ---
 
-## Disqualification rules
-
-13 deterministic rules live in `src/lib/terms.ts` (`DISQUALIFICATION_REASONS`).
-Summary:
-
-1. Missing required hashtag / mention / phrase from the brand's terms
-2. Caption doesn't reference the campaign
-3. Account switched / handle changed between join and final proof
-4. View count drops (indicative of deletion)
-5. Final proof missed — outside the 7-day window
-6. Duplicate proof (same social URL on two campaigns)
-7. View-bot signatures (velocity anomalies above platform thresholds)
-8. Private / deleted post at settlement time
-9. Content mismatch (campaign is about X, post is about Y)
-10. Caption engagement-farming (banned-phrase list)
-11. Self-engagement ring detected
-12. Brand-side fraud signals (flagged by Reclaim adapter)
-13. T&C not signed or signed-wallet mismatch
-
-Three strikes across campaigns → **90-day ban**, enforced at join time.
-
----
-
-## Testing
+## Common commands
 
 ```bash
-npm run test
+npm run dev                   # local dev (port 3000)
+npm run build                 # production build
+npm test                      # 45 Vitest tests across 6 files
+npm run typecheck             # tsc --noEmit
+
+npx drizzle-kit push          # apply schema to live DB
+npx drizzle-kit generate      # generate migration SQL
+node scripts/seed.mjs         # seed with 8 campaigns, 5 creators, 23 proofs
+
+vercel deploy --prod --yes    # push to production
 ```
 
-45 tests across 6 files covering: payout delta math, settlement window logic,
-mode derivation, terms builders, ban evaluation, and reclaim verify rules.
+---
 
-CI runs lint + typecheck + tests + build on every push via
-`.github/workflows/ci.yml`.
+## Documentation
+
+| Document | What it covers |
+| --- | --- |
+| `docs/PROJECT.md` | Architecture deep-dive, design decisions, problem log |
+| `docs/PRODUCTION_ROADMAP.md` | Every remaining task tagged P0–P4, paste-ready prompts |
+| `docs/SECURITY.md` | Threat model, multisig migration runbook, ops runbooks |
+| `docs/strategy/` | Grant applications (Reclaim, Superteam, Solana Foundation), 28-day Twitter calendar, Founder NFT spec |
+
+On-site docs: <https://dashhnew.vercel.app/docs>
 
 ---
 
-## Deployment
+## Status
 
-**Vercel:**
-
-1. Import the repo at [vercel.com/new](https://vercel.com/new).
-2. Framework preset: **Next.js** (auto-detected).
-3. Add every variable from `.env.example` under **Project → Settings → Environment Variables**.
-4. Deploy.
-
-**Cron** (already wired in `vercel.json`):
-
-| Path | Schedule | Purpose |
-| --- | --- | --- |
-| `/api/v2/sync` | every 30 min | Poll public APIs for display-only view updates |
-| `/api/v2/settle` | every 6 h | Trigger settlement for campaigns past the 7-day window |
-
-Cron never moves money directly — it only queues settlements that still require
-the creator's final zkTLS proof.
+- ✅ **Devnet:** live, fully functional end-to-end (form → join →
+  proof → settle → payout)
+- ✅ **45/45 Vitest tests** passing on CI
+- ⏳ **Mainnet:** gated on (a) audited Anchor escrow program, (b)
+  Squads multisig on the platform wallet, (c) basic KYB on high-value
+  brands. See `docs/PRODUCTION_ROADMAP.md` P2.1, P2.2, P4.2.
+- ⏳ **Founder NFT mint:** planned for after 300+ Twitter followers and
+  one real-brand case study. Spec in `docs/strategy/founder-pass-spec.md`.
 
 ---
 
-## Docs
+## Contact
 
-- `docs/PROJECT.md` — full architecture, decisions, problems-and-fixes log.
-- `docs/VIVA_PREP.md` + `VIVA_PREP.pdf` — partition-wise viva prep for the
-  5-person team (90 Q&As).
-- `/how-it-works` — the live visual walkthrough for end-users.
+- **Email:** [vedant1609singh@gmail.com](mailto:vedant1609singh@gmail.com)
+- **Twitter:** [@dashhhee](https://x.com/dashhhee)
+- **Solana wallet (grant + bounty receive):**
+  `7ZyHfVPKqQN67LtQ6Drr1WhLfpYwbmAzQ5v8xpsAvqve`
 
----
-
-## License
-
-MIT — see `LICENSE` if present, otherwise assume MIT for this academic project.
+If you're a grant reviewer, brand interested in piloting, or builder
+working on adjacent infrastructure — DM works, email is fine, anything
+goes.
 
 ---
 
-Built for the SGSITS UG Major Project, 2025-26.
+*MIT licensed. Built solo by Vedant Singh, Indore.*
