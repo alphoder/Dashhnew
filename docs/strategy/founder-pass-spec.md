@@ -244,7 +244,7 @@ Two routing options for the mint revenue:
   income for professionals) — simple.
 
 - **Sole proprietorship** (if revenue > ₹5L/year): cleaner audit trail.
-  Open a current account in your name as "<<Vedant Singh>>, sole
+  Open a current account in your name as "Vedant Singh, sole
   proprietor of DASHH." Get a CA. Optional GST registration if revenue
   > ₹20L/year.
 

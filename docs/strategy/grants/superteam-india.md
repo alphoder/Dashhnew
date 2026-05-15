@@ -112,10 +112,10 @@ Each milestone closed with a public Twitter thread + screen-recording.
 
 - Name: **Vedant Singh**
 - Email: `<<your-email@example.com>>`
-- Twitter: `<<@yourhandle>>`
+- Twitter: `@dashhhee`
 - Discord: `<<discord-handle>>`
 - Telegram: `<<@telegramhandle>>`
-- Solana wallet (USDC receive): `<<dedicated-DASHH-treasury-wallet>>`
+- Solana wallet (USDC receive): `7ZyHfVPKqQN67LtQ6Drr1WhLfpYwbmAzQ5v8xpsAvqve`
 
 ---
 

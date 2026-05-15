@@ -175,10 +175,10 @@ Academic project supervision: **Ms. Ritambhara Patidar** and
 
 - Name: **Vedant Singh**
 - Email: `<<your-email@example.com>>`
-- Twitter: `<<@yourhandle>>`
+- Twitter: `@dashhhee`
 - GitHub: <https://github.com/alphoder/Dashhnew>
 - Live demo: <https://dashhnew.vercel.app>
-- Solana wallet (grant receive): `<<dedicated-DASHH-treasury-wallet>>`
+- Solana wallet (grant receive): `7ZyHfVPKqQN67LtQ6Drr1WhLfpYwbmAzQ5v8xpsAvqve`
 
 ---
 

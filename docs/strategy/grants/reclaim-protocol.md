@@ -29,7 +29,7 @@ and every line of the frontend.
 
 - GitHub: <https://github.com/alphoder/Dashhnew>
 - Live: <https://dashhnew.vercel.app>
-- Twitter: `<<@yourhandle>>`
+- Twitter: `@dashhhee`
 - Available full-time on DASHH post-graduation (June 2026)
 
 ## 4. The problem we're solving
@@ -149,7 +149,7 @@ Total scope: 8–10 weeks of focused solo work post-graduation (June 2026 onward
 
 - Name: **Vedant Singh**
 - Email: `<<your-email@example.com>>`
-- Twitter: `<<@yourhandle>>`
+- Twitter: `@dashhhee`
 - GitHub: alphoder/Dashhnew
 - Live demo: <https://dashhnew.vercel.app>
 
