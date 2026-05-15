@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Instagram, Youtube, Twitter, Music2 } from "lucide-react";
 import { HoverLift } from "@/components/motion/hover-lift";
+import { VerifiedBadge } from "@/components/verified-badge";
 
 type Platform = "instagram" | "youtube" | "twitter" | "tiktok";
 
@@ -26,6 +27,9 @@ export interface CampaignCardData {
   cpv: number;
   endsAt: string | Date;
   status: string;
+  /** Returned by /api/v2/campaigns when the brand has been manually vetted. */
+  brandVerified?: boolean;
+  brandVerificationLevel?: 'none' | 'basic' | 'kyb' | string;
 }
 
 export function CampaignCard({
@@ -63,10 +67,21 @@ export function CampaignCard({
           <Icon className="h-3.5 w-3.5" />
           {campaign.platform}
         </div>
+        {campaign.brandVerified && (
+          <div className="absolute top-2 left-2 flex items-center gap-1 rounded-full bg-black/70 backdrop-blur px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-[#14F195]">
+            <VerifiedBadge level={campaign.brandVerificationLevel} size="xs" />
+            Verified brand
+          </div>
+        )}
       </div>
       <CardContent className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-base leading-tight">{campaign.title}</h3>
+          <h3 className="font-semibold text-base leading-tight flex items-center gap-1.5">
+            {campaign.title}
+            {campaign.brandVerified && (
+              <VerifiedBadge level={campaign.brandVerificationLevel} size="sm" />
+            )}
+          </h3>
           <span className="text-xs text-zinc-400 whitespace-nowrap">
             {daysLeft}d left
           </span>

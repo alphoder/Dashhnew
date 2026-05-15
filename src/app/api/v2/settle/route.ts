@@ -122,6 +122,69 @@ async function executePendingPayoutsForCampaign(
       });
       stats.paid++;
       stats.lamports += Math.floor(payout.amount * 1_000_000_000);
+
+      // Referral bonus — when this is one of the recipient's first 3
+      // settled payouts AND they have a referrer on file, send 1% bonus.
+      // The cap and percentage are conservative on purpose; once we have
+      // mainnet usage data we can tune them.
+      try {
+        const [creatorProfile] = await db
+          .select()
+          .from(schema.profiles)
+          .where(
+            and(
+              eq(schema.profiles.wallet, recipient),
+              eq(schema.profiles.role, 'creator'),
+            ),
+          )
+          .limit(1);
+        const referrer = (creatorProfile as any)?.referredBy as
+          | string
+          | null;
+        const bonusesPaid = (creatorProfile as any)?.referralBonusesPaid ?? 0;
+        if (creatorProfile && referrer && bonusesPaid < 3) {
+          const bonus = payout.amount * 0.01;
+          // Skip dust to avoid creating ~0-lamport tx
+          if (bonus >= 0.000001) {
+            const bonusResult = await executePayout({
+              toWallet: referrer,
+              amountSol: bonus,
+            });
+            if (
+              bonusResult.kind === 'paid' ||
+              bonusResult.kind === 'dry_run'
+            ) {
+              await db
+                .update(schema.profiles)
+                .set({
+                  referralBonusesPaid: bonusesPaid + 1,
+                  referralBonusesEarned:
+                    ((creatorProfile as any).referralBonusesEarned ?? 0) +
+                    bonus,
+                  updatedAt: new Date(),
+                })
+                .where(eq(schema.profiles.id, creatorProfile.id));
+              await db.insert(schema.notifications).values({
+                wallet: referrer,
+                kind: 'referral_bonus_paid',
+                title: `Referral bonus · ${bonus.toFixed(6)} SOL`,
+                body: `Your referred creator earned a payout. Bonus #${bonusesPaid + 1} of 3.`,
+                payload: {
+                  amount: bonus,
+                  referredCreator: recipient,
+                  txSignature:
+                    bonusResult.kind === 'paid'
+                      ? bonusResult.signature
+                      : `DRY_RUN:${bonusResult.reason}`,
+                  payoutCount: bonusesPaid + 1,
+                },
+              });
+            }
+          }
+        }
+      } catch (refErr) {
+        console.error('[settle] referral bonus failed', refErr);
+      }
     } else if (result.kind === 'dry_run') {
       // No signing key configured (devnet/staging) — record a synthetic
       // signature so the row visibly settles in the UI without hiding the

@@ -69,6 +69,12 @@ export default function Footer() {
               <Link href="/onboarding" className="text-zinc-300 hover:text-white transition-colors">
                 Get started
               </Link>
+              <Link href="/case-studies" className="text-zinc-300 hover:text-white transition-colors">
+                Case studies
+              </Link>
+              <Link href="/docs" className="text-zinc-300 hover:text-white transition-colors">
+                Docs
+              </Link>
               <Link href="/terms" className="text-zinc-300 hover:text-white transition-colors">
                 Campaign terms
               </Link>

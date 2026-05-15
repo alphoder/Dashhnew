@@ -80,6 +80,21 @@ export const profiles = pgTable(
     banReason: text('ban_reason'),
     bannedAt: timestamp('banned_at', { withTimezone: true }),
     disqualificationCount: integer('disqualification_count').default(0).notNull(),
+    // Brand verification — flipped manually after a vetting pass. UI shows
+    // a blue check next to verified brands. Three levels:
+    //   none  — default; no badge
+    //   basic — email/business name confirmed
+    //   kyb   — full Know-Your-Business with documentation
+    verified: boolean('verified').default(false).notNull(),
+    verifiedAt: timestamp('verified_at', { withTimezone: true }),
+    verificationLevel: text('verification_level').default('none'),
+    // Referral tracking — set on first participation if `?ref=<wallet>`
+    // was in the URL when this user joined a campaign. The referrer earns
+    // a 1% bonus on each of this wallet's first 3 settled payouts.
+    referredBy: text('referred_by'),
+    referredAt: timestamp('referred_at', { withTimezone: true }),
+    referralBonusesEarned: real('referral_bonuses_earned').default(0).notNull(),
+    referralBonusesPaid: integer('referral_bonuses_paid').default(0).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },

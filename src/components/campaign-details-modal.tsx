@@ -332,6 +332,10 @@ export function CampaignDetailsModal({
         setJoining(false);
         return;
       }
+      const referredBy =
+        typeof window !== 'undefined'
+          ? window.localStorage.getItem('dashh_referrer')
+          : null;
       const res = await fetch(`/api/v2/campaigns/${campaign.id}/participate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -339,6 +343,7 @@ export function CampaignDetailsModal({
           creatorWallet: wallet,
           termsVersion: CREATOR_TERMS_VERSION,
           termsSignature,
+          referredBy: referredBy && referredBy !== wallet ? referredBy : undefined,
         }),
       });
       if (!res.ok) {
@@ -560,6 +565,38 @@ export function CampaignDetailsModal({
                     Top participants
                   </p>
                   No creators yet — be the first to join.
+                </div>
+              )}
+
+              {/* Embed-code snippet — only the brand sees this. */}
+              {campaign && viewerWallet === campaign.brandWallet && (
+                <div className="rounded-xl border border-white/10 bg-black/40 p-4 text-xs">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-zinc-400">
+                    Embed this campaign on your site
+                  </p>
+                  <pre className="overflow-x-auto rounded-md bg-black/60 p-3 font-mono text-[11px] leading-relaxed text-zinc-300">
+{`<iframe
+  src="${typeof window !== 'undefined' ? window.location.origin : 'https://dashhnew.vercel.app'}/embed/campaign/${campaign.id}"
+  width="400" height="320"
+  style="border:0; border-radius:12px"
+  loading="lazy" />`}
+                  </pre>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const origin =
+                        typeof window !== 'undefined'
+                          ? window.location.origin
+                          : 'https://dashhnew.vercel.app';
+                      navigator.clipboard.writeText(
+                        `<iframe src="${origin}/embed/campaign/${campaign.id}" width="400" height="320" style="border:0; border-radius:12px" loading="lazy"></iframe>`,
+                      );
+                      toast.success('Embed code copied');
+                    }}
+                    className="mt-2 rounded border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-200 hover:bg-white/10"
+                  >
+                    Copy embed code
+                  </button>
                 </div>
               )}
 

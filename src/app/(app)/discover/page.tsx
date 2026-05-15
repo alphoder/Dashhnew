@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { CampaignCard, type CampaignCardData } from '@/components/campaign-card';
 import { CampaignDetailsModal } from '@/components/campaign-details-modal';
 import { Button } from '@/components/ui/button';
@@ -14,11 +15,25 @@ import { SkeletonCardGrid } from '@/components/ui/skeleton';
 type Platform = 'all' | 'instagram' | 'youtube' | 'twitter' | 'tiktok';
 
 export default function DiscoverPage() {
+  const searchParams = useSearchParams();
   const [campaigns, setCampaigns] = useState<CampaignCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Stash a ?ref=<wallet> parameter into localStorage so the participate
+  // endpoint can read it later when the user first joins a campaign.
+  // We only honour the first ref seen — subsequent visits don't overwrite.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const ref = searchParams?.get('ref');
+    if (!ref) return;
+    if (!window.localStorage.getItem('dashh_referrer')) {
+      window.localStorage.setItem('dashh_referrer', ref);
+    }
+  }, [searchParams]);
   const [platform, setPlatform] = useState<Platform>('all');
   const [query, setQuery] = useState('');
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
@@ -31,6 +46,7 @@ export default function DiscoverPage() {
       try {
         const params = new URLSearchParams({ status: 'active' });
         if (platform !== 'all') params.set('platform', platform);
+        if (verifiedOnly) params.set('verifiedOnly', 'true');
         const res = await fetch(`/api/v2/campaigns?${params}`, {
           cache: 'no-store',
         });
@@ -51,7 +67,7 @@ export default function DiscoverPage() {
     return () => {
       active = false;
     };
-  }, [platform, reloadKey]);
+  }, [platform, verifiedOnly, reloadKey]);
 
   const filtered = campaigns.filter((c) => {
     if (!query.trim()) return true;
@@ -90,7 +106,7 @@ export default function DiscoverPage() {
 
       <ReferralCard />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {platforms.map((p) => (
           <Button
             key={p.id}
@@ -106,6 +122,17 @@ export default function DiscoverPage() {
             {p.label}
           </Button>
         ))}
+        <div className="ml-auto">
+          <label className="inline-flex cursor-pointer select-none items-center gap-2 rounded-md border border-white/10 bg-black/40 px-3 py-1.5 text-xs text-zinc-200 hover:bg-white/5">
+            <input
+              type="checkbox"
+              checked={verifiedOnly}
+              onChange={(e) => setVerifiedOnly(e.target.checked)}
+              className="h-3.5 w-3.5 accent-[#14F195]"
+            />
+            Verified brands only
+          </label>
+        </div>
       </div>
 
       {loading ? (

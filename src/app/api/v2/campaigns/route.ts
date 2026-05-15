@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from '@/lib/db/schemas';
@@ -22,6 +22,7 @@ export async function GET(req: Request) {
     const platform = searchParams.get('platform');
     const status = searchParams.get('status') ?? 'active';
     const brandWallet = searchParams.get('brand');
+    const verifiedOnly = searchParams.get('verifiedOnly') === 'true';
 
     const db = getDb();
     let rows = await db
@@ -34,7 +35,45 @@ export async function GET(req: Request) {
     if (status) rows = rows.filter((r) => r.status === status);
     if (brandWallet) rows = rows.filter((r) => r.brandWallet === brandWallet);
 
-    return NextResponse.json({ campaigns: rows });
+    // Enrich with brand verification status — single batch lookup so we
+    // don't N+1 the profiles table per campaign card.
+    let verifiedByWallet = new Map<string, { level: string; at: Date | null }>();
+    if (rows.length > 0) {
+      try {
+        const brandWallets = Array.from(new Set(rows.map((r) => r.brandWallet)));
+        const profiles = await db
+          .select()
+          .from(schema.profiles)
+          .where(eq(schema.profiles.role, 'brand'));
+        for (const p of profiles) {
+          if (!brandWallets.includes(p.wallet)) continue;
+          if ((p as any).verified) {
+            verifiedByWallet.set(p.wallet, {
+              level: (p as any).verificationLevel ?? 'basic',
+              at: (p as any).verifiedAt ?? null,
+            });
+          }
+        }
+      } catch {
+        // Schema-migration races: if `verified` doesn't exist yet on the
+        // live DB, we just don't show badges. Never break the list.
+      }
+    }
+
+    const enriched = rows.map((r) => {
+      const v = verifiedByWallet.get(r.brandWallet);
+      return {
+        ...r,
+        brandVerified: !!v,
+        brandVerificationLevel: v?.level ?? 'none',
+      };
+    });
+
+    const final = verifiedOnly
+      ? enriched.filter((r) => r.brandVerified)
+      : enriched;
+
+    return NextResponse.json({ campaigns: final });
   } catch (err: any) {
     return NextResponse.json(
       { error: err?.message ?? 'internal error', campaigns: [] },

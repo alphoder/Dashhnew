@@ -17,6 +17,9 @@ const bodySchema = z.object({
   postUrl: z.string().url().optional(),
   termsVersion: z.string().min(1).optional(),
   termsSignature: z.string().min(10).optional(),
+  // Wallet that referred this creator. We only honour it on the wallet's
+  // very first participation; subsequent joins ignore the field.
+  referredBy: z.string().min(32).optional(),
 });
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
@@ -109,6 +112,61 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         body: `${parsed.data.creatorWallet.slice(0, 6)}… joined "${campaign.title}"`,
         payload: { campaignId: campaign.id, creator: parsed.data.creatorWallet },
       });
+
+      // Referral stamp — record on the creator's profile so future
+      // settlements can pay out the referrer bonus. Only fires on first
+      // participation. The referrer cannot be the same wallet.
+      if (
+        parsed.data.referredBy &&
+        parsed.data.referredBy !== parsed.data.creatorWallet
+      ) {
+        try {
+          const [creatorProfile] = await db
+            .select()
+            .from(schema.profiles)
+            .where(
+              and(
+                eq(schema.profiles.wallet, parsed.data.creatorWallet),
+                eq(schema.profiles.role, 'creator'),
+              ),
+            )
+            .limit(1);
+
+          if (!creatorProfile) {
+            await db.insert(schema.profiles).values({
+              wallet: parsed.data.creatorWallet,
+              role: 'creator',
+              referredBy: parsed.data.referredBy,
+              referredAt: new Date(),
+            });
+          } else if (!(creatorProfile as any).referredBy) {
+            await db
+              .update(schema.profiles)
+              .set({
+                referredBy: parsed.data.referredBy,
+                referredAt: new Date(),
+                updatedAt: new Date(),
+              })
+              .where(eq(schema.profiles.id, creatorProfile.id));
+          }
+
+          // Notify the referrer that a friend joined.
+          await db.insert(schema.notifications).values({
+            wallet: parsed.data.referredBy,
+            kind: 'referral_joined',
+            title: 'A creator joined via your referral',
+            body: `${parsed.data.creatorWallet.slice(0, 6)}… joined "${campaign.title}" through your link. You'll earn a 1% bonus on their first 3 settled payouts.`,
+            payload: {
+              campaignId: campaign.id,
+              referredCreator: parsed.data.creatorWallet,
+            },
+          });
+        } catch (refErr) {
+          // Don't fail the join if referral stamping breaks — it's a
+          // best-effort attribution. Log and continue.
+          console.error('[participate] referral stamp failed', refErr);
+        }
+      }
     }
 
     return NextResponse.json({ participation });
