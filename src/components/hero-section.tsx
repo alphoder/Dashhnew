@@ -39,27 +39,34 @@ export function HeroSection() {
     <section className="h-screen min-h-fit my-2 mb-36 md:mb-0">
       <div className="container relative h-full items-center flex  justify-center mx-auto px-4 py-24 lg:px-8">
         <div className="grid gap-12  lg:grid-cols-2 lg:gap-8">
-          <div className="flex   h-full mt-36 z-10 md:mt-0 text-center md:text-left flex-col justify-center space-y-12 items-center md:items-start md:space-y-20">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
-              <span className="bg-gradient-to-r relative  from-[#9945FF] to-[#9945FF] bg-clip-text text-transparent">
-                Decentralized&nbsp;
+          <div className="flex   h-full mt-36 z-10 md:mt-0 text-center md:text-left flex-col justify-center space-y-10 items-center md:items-start md:space-y-12">
+            <div className="inline-flex items-center gap-2 self-center md:self-start rounded-full border border-[#14F195]/30 bg-[#14F195]/10 px-3 py-1 text-[11px] font-medium text-[#14F195]">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#14F195] opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#14F195]" />
               </span>
-              <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
-                Marketing&nbsp;
-              </span>
+              Live on Solana Devnet · zkTLS-verified
+            </div>
 
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
+              <span className="text-white">Brands paid </span>
+              <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
+                $1.4B
+              </span>
+              <span className="text-white"> for </span>
+              <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
+                fake&nbsp;views
+              </span>
+              <span className="text-white"> in 2025.</span>
               <br />
-              <span className="text-white">for a Global Audience</span>
+              <span className="text-white">We make that mathematically impossible.</span>
             </h1>
             <div className="space-y-4">
-              <p className="text-base md:text-lg text-center md:text-left text-zinc-300 leading-relaxed">
-                DASHH is revolutionizing advertising by connecting brands with
-                top-tier micro-influencers around the world. Our decentralized
-                platform ensures that every influencer is fairly rewarded for
-                genuine engagement, regardless of their location.
-              </p>
-              <p className="text-lg text-gray-300">
-                {/* And you? You get unmatched transparency, real-time performance tracking, and access to the best engagement-driven talent in the industry, all powered by Solana’s blockchain technology. */}
+              <p className="text-base md:text-lg text-center md:text-left text-zinc-300 leading-relaxed max-w-xl">
+                DASHH escrows your ad budget on Solana, verifies every view with
+                <span className="text-white font-medium"> zkTLS proofs</span> via Reclaim Protocol,
+                and pays creators only for real engagement.
+                No middlemen, no admins, no manipulation.
               </p>
             </div>
             {/* <div className="absolute w-screen overflow-hidden inset-0 z-0">
@@ -90,8 +97,14 @@ export function HeroSection() {
                 />
               ))}
             </div> */}
-            <div>
+            <div className="flex flex-wrap items-center gap-3">
               <PrimaryCTA variant="hero" />
+              <Link
+                href="/discover?demo=1"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/90 transition hover:bg-white/10"
+              >
+                Try the live demo · no wallet needed
+              </Link>
             </div>
           </div>
 

@@ -106,6 +106,41 @@ export default function CreatorForm() {
   const [requiredMention, setRequiredMention] = useState("");
   const [requiredPhrase, setRequiredPhrase] = useState("");
 
+  // Apply a campaign template — bulk-sets every form field to sensible
+  // defaults for the chosen format. Brand can still edit anything before
+  // submitting. Templates fill the most-skipped fields (platform, payment
+  // model, end date, hashtag), which are the largest source of form
+  // abandonment in marketplace flows.
+  function applyTemplate(t: {
+    title: string;
+    description: string;
+    label: string;
+    iconUrl: string;
+    platform: Platform;
+    paymentModel: PaymentModel;
+    topNCount?: number;
+    durationDays: number;
+    budget: string;
+    requiredHashtag?: string;
+    requiredMention?: string;
+  }) {
+    setContent({
+      title: t.title,
+      description: t.description,
+      label: t.label,
+      icons: t.iconUrl,
+      amount: t.budget,
+      end: "",
+    });
+    setPlatform(t.platform);
+    setPaymentModel(t.paymentModel);
+    if (t.topNCount) setTopNCount(t.topNCount);
+    setRequiredHashtag(t.requiredHashtag ?? "");
+    setRequiredMention(t.requiredMention ?? "");
+    setRequiredPhrase("");
+    setEndDate(new Date(Date.now() + t.durationDays * 86_400_000));
+  }
+
   const [formamount, setFormAmount] = useState(0);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
 
@@ -360,6 +395,108 @@ export default function CreatorForm() {
           <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] items-start">
             {/* LEFT column — form cards */}
             <div className="space-y-6">
+              {/* Template picker — collapses the average brand's
+                  decision-load by giving them a one-click starting point. */}
+              <div className="rounded-xl border border-[#9945FF]/20 bg-gradient-to-br from-[#9945FF]/5 to-black p-5">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#9945FF]">
+                  Start from a template
+                </p>
+                <p className="mb-3 text-xs text-zinc-400">
+                  Pick a starting point — every field below auto-fills.
+                  Customize anything before you submit.
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {[
+                    {
+                      key: "ig-reel",
+                      label: "Instagram Reel",
+                      hint: "Per-view · 14 days · #yourbrand",
+                      template: {
+                        title: "Instagram Reel for [your brand]",
+                        description:
+                          "Create a 30-second reel featuring our product. Include the required hashtag in your caption.",
+                        label: "Make a reel",
+                        iconUrl:
+                          "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800",
+                        platform: "instagram" as Platform,
+                        paymentModel: "per_view" as PaymentModel,
+                        durationDays: 14,
+                        budget: "0.5",
+                        requiredHashtag: "#yourbrand",
+                      },
+                    },
+                    {
+                      key: "yt-short",
+                      label: "YouTube Short",
+                      hint: "Per-view · 30 days · winner-takes-all option",
+                      template: {
+                        title: "YouTube Short promo",
+                        description:
+                          "60-second YouTube Short demonstrating our product. Mention us in the title.",
+                        label: "Drop a Short",
+                        iconUrl:
+                          "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800",
+                        platform: "youtube" as Platform,
+                        paymentModel: "per_view" as PaymentModel,
+                        durationDays: 30,
+                        budget: "1.0",
+                        requiredMention: "@yourbrand",
+                      },
+                    },
+                    {
+                      key: "x-thread",
+                      label: "X (Twitter) Thread",
+                      hint: "Top-performer · 7 days · big share",
+                      template: {
+                        title: "X thread campaign",
+                        description:
+                          "Write a 5-tweet thread about your experience with our product. The thread with the most verified views wins the entire pool.",
+                        label: "Write a thread",
+                        iconUrl:
+                          "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800",
+                        platform: "twitter" as Platform,
+                        paymentModel: "top_performer" as PaymentModel,
+                        durationDays: 7,
+                        budget: "0.75",
+                        requiredHashtag: "#yourbrand",
+                      },
+                    },
+                    {
+                      key: "tiktok-grwm",
+                      label: "TikTok GRWM",
+                      hint: "Equal split · 10 days · everyone wins",
+                      template: {
+                        title: "TikTok GRWM with our product",
+                        description:
+                          "Get-Ready-With-Me featuring our product. Every verified creator gets an equal share — quality over virality.",
+                        label: "Make a GRWM",
+                        iconUrl:
+                          "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800",
+                        platform: "tiktok" as Platform,
+                        paymentModel: "equal_split" as PaymentModel,
+                        durationDays: 10,
+                        budget: "0.6",
+                        requiredMention: "@yourbrand",
+                      },
+                    },
+                  ].map((t) => (
+                    <button
+                      type="button"
+                      key={t.key}
+                      onClick={() => applyTemplate(t.template)}
+                      className="group rounded-lg border border-white/10 bg-black/40 p-3 text-left transition hover:border-[#14F195]/40 hover:bg-black/60"
+                    >
+                      <p className="text-sm font-semibold text-white group-hover:text-[#14F195]">
+                        {t.label}
+                      </p>
+                      <p className="mt-1 text-[11px] text-zinc-500">
+                        {t.hint}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Campaign details card */}
               <div className="rounded-xl border border-white/10 bg-black/60 text-zinc-200 shadow-lg">
                 <CardHeader className="p-5 border-b border-white/10">

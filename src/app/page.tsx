@@ -4,6 +4,9 @@ import { HeroSection } from "@/components/hero-section";
 import { PrimaryCTA } from "@/components/primary-cta";
 import { FadeIn, Stagger, StaggerItem } from "@/components/motion/fade-in";
 import { HoverLift } from "@/components/motion/hover-lift";
+import { LiveMetrics } from "@/components/landing/live-metrics";
+import { CompareTable } from "@/components/landing/compare-table";
+import { FAQ } from "@/components/landing/faq";
 import {
   Compass,
   LayoutDashboard,
@@ -164,6 +167,10 @@ export default function FrontPage() {
     <>
       <HeroSection />
 
+      {/* Live, on-chain-derived counters — the highest-impact section for
+          investor / grant evaluators. Shows the product is real, not a mock. */}
+      <LiveMetrics />
+
       {/* Value propositions */}
       <section className="relative w-full py-16 md:py-24">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
@@ -200,6 +207,10 @@ export default function FrontPage() {
           </Stagger>
         </div>
       </section>
+
+      {/* Compare-vs-competitors table — converts the "why DASHH over the
+          status quo" question into a single scannable visual. */}
+      <CompareTable />
 
       {/* Route explorer */}
       <section
@@ -341,6 +352,11 @@ export default function FrontPage() {
           </Stagger>
         </div>
       </section>
+
+      {/* FAQ — answers the predictable objections so evaluators / users
+          don't have to ask. Positioned right before the closing CTA so the
+          conversion happens with all questions resolved. */}
+      <FAQ />
 
       {/* Closing CTA */}
       <section className="relative w-full py-20">

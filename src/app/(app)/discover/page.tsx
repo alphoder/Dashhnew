@@ -4,33 +4,45 @@ import { useEffect, useState } from 'react';
 import { CampaignCard, type CampaignCardData } from '@/components/campaign-card';
 import { CampaignDetailsModal } from '@/components/campaign-details-modal';
 import { Button } from '@/components/ui/button';
-import { Loader2, Search } from 'lucide-react';
+import { Compass, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ReferralCard } from '@/components/referral-card';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
+import { SkeletonCardGrid } from '@/components/ui/skeleton';
 
 type Platform = 'all' | 'instagram' | 'youtube' | 'twitter' | 'tiktok';
 
 export default function DiscoverPage() {
   const [campaigns, setCampaigns] = useState<CampaignCardData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [platform, setPlatform] = useState<Platform>('all');
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
     async function load() {
       setLoading(true);
+      setError(null);
       try {
         const params = new URLSearchParams({ status: 'active' });
         if (platform !== 'all') params.set('platform', platform);
-        const res = await fetch(`/api/v2/campaigns?${params}`, { cache: 'no-store' });
+        const res = await fetch(`/api/v2/campaigns?${params}`, {
+          cache: 'no-store',
+        });
+        if (!res.ok) {
+          throw new Error(`Server returned ${res.status}`);
+        }
         const data = await res.json();
         if (!active) return;
         setCampaigns(data.campaigns ?? []);
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
+        if (active) setError(err?.message ?? 'Could not load campaigns');
       } finally {
         if (active) setLoading(false);
       }
@@ -39,7 +51,7 @@ export default function DiscoverPage() {
     return () => {
       active = false;
     };
-  }, [platform]);
+  }, [platform, reloadKey]);
 
   const filtered = campaigns.filter((c) => {
     if (!query.trim()) return true;
@@ -97,20 +109,42 @@ export default function DiscoverPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-24 text-zinc-400">
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading campaigns…
-        </div>
+        <SkeletonCardGrid count={6} />
+      ) : error ? (
+        <ErrorState
+          title="Couldn't load campaigns"
+          description="The campaigns API responded with an error. The product is still live — this is usually a transient blip."
+          detail={error}
+          onRetry={() => setReloadKey((k) => k + 1)}
+        />
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border border-white/10 bg-black/40 p-12 text-center text-zinc-400">
-          <p className="mb-2 text-lg text-white">No campaigns yet.</p>
-          <p className="text-sm">
-            Brands — head to{' '}
-            <a href="/form" className="text-[#14F195] underline">
-              create a campaign
-            </a>{' '}
-            to get started.
-          </p>
-        </div>
+        <EmptyState
+          icon={Compass}
+          title={query ? 'No campaigns match your search' : 'No campaigns yet'}
+          description={
+            query
+              ? `Nothing matched "${query}". Try a different keyword or clear the search.`
+              : 'Be the first brand on the platform — create a campaign and creators will see it instantly on this page.'
+          }
+          action={
+            query ? (
+              <Button
+                variant="outline"
+                onClick={() => setQuery('')}
+                className="border-white/10 bg-transparent text-zinc-200 hover:bg-white/5"
+              >
+                Clear search
+              </Button>
+            ) : (
+              <a
+                href="/form"
+                className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-[#9945FF] to-[#14F195] px-4 py-2 text-sm font-semibold text-black hover:opacity-90"
+              >
+                Launch a campaign
+              </a>
+            )
+          }
+        />
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((c) => (
