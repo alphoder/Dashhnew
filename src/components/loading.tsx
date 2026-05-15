@@ -1,46 +1,23 @@
-"use client"
+// Top-level route loading state.
+//
+// Used by Next.js convention `loading.tsx` files at every route boundary.
+// Renders a centered gradient-ring spinner that matches the brand palette
+// so navigations don't flash blank.
 
-import { useState, useEffect } from "react"
+import { Loader2 } from 'lucide-react';
 
 export default function SolanaLoadingComponent() {
-  const [progress, setProgress] = useState(0)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((oldProgress) => {
-        if (oldProgress === 100) {
-          return 0
-        }
-        const diff = Math.random() * 10
-        return Math.min(oldProgress + diff, 100)
-      })
-    }, 200)
-
-    return () => {
-      clearInterval(timer)
-    }
-  }, [])
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-r from-[#9945FF] via-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
-      <div className="w-full max-w-md">
-        <div className="mb-4 flex items-center justify-between">
-          <span className="text-[#9945FF] text-sm font-medium">Loading</span>
-          <span className="text-[#9945FF] text-sm font-medium">{Math.round(progress)}%</span>
+    <div className="flex h-[60vh] items-center justify-center text-zinc-400">
+      <div className="flex flex-col items-center gap-3">
+        <div className="relative">
+          <Loader2 className="h-8 w-8 animate-spin text-[#14F195]" />
+          <div className="absolute inset-0 animate-ping rounded-full bg-[#9945FF]/20" />
         </div>
-        <div className="h-1 w-full bg-gray-900 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-[#9945FF] via-[#9945FF] to-[#14F195] transition-all duration-200 ease-out"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <div className="mt-8 flex justify-center">
-          <svg className="animate-spin h-8 w-8 text-[#9945FF]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 5.373 12h4zm2 5.291A7.962 7.962 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </div>
+        <p className="text-xs uppercase tracking-widest text-zinc-500">
+          Loading…
+        </p>
       </div>
     </div>
-  )
+  );
 }
