@@ -5,6 +5,7 @@ import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from '@/lib/db/schemas';
 import { z } from 'zod';
 import { LIMITS, rateLimitBoth } from '@/lib/ratelimit';
+import { guardWrites } from '@/lib/kill-switch';
 import { getAdapter } from '@/lib/reclaim';
 import { verify } from '@/lib/reclaim/verify';
 import { anchorProofToArweave } from '@/lib/arweave';
@@ -80,6 +81,8 @@ async function recordDisqualification(
 }
 
 export async function POST(req: Request) {
+  const blocked = guardWrites();
+  if (blocked) return blocked;
   try {
     const body = await req.json();
     const parsed = submitSchema.safeParse(body);

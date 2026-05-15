@@ -568,6 +568,24 @@ export function CampaignDetailsModal({
                 </div>
               )}
 
+              {/* Invoice link — brand-only. Opens a print-friendly page. */}
+              {campaign && viewerWallet === campaign.brandWallet && (
+                <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/40 p-3 text-xs">
+                  <span className="text-zinc-300">
+                    Need a GST invoice for accounting?
+                  </span>
+                  <Link
+                    href={`/invoice/${campaign.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 rounded border border-white/10 bg-white/5 px-3 py-1 text-zinc-200 hover:bg-white/10"
+                  >
+                    Open invoice
+                    <ExternalLink className="h-3 w-3" />
+                  </Link>
+                </div>
+              )}
+
               {/* Embed-code snippet — only the brand sees this. */}
               {campaign && viewerWallet === campaign.brandWallet && (
                 <div className="rounded-xl border border-white/10 bg-black/40 p-4 text-xs">

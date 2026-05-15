@@ -4,6 +4,7 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from '@/lib/db/schemas';
 import { LIMITS, rateLimitBoth } from '@/lib/ratelimit';
+import { guardWrites } from '@/lib/kill-switch';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -23,6 +24,8 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
+  const blocked = guardWrites();
+  if (blocked) return blocked;
   try {
     const body = await req.json();
     const parsed = bodySchema.safeParse(body);

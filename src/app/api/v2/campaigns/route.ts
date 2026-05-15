@@ -7,6 +7,7 @@ import { createCampaignSchema } from '@/lib/validation/campaign';
 import { LIMITS, rateLimitBoth } from '@/lib/ratelimit';
 import { getSession } from '@/lib/auth/session';
 import { getClientIp, verifyTurnstile } from '@/lib/captcha';
+import { guardWrites } from '@/lib/kill-switch';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,6 +84,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const blocked = guardWrites();
+  if (blocked) return blocked;
   try {
     // Session guard — prefer SIWS session, fall back to body-provided wallet
     // while the SIWS flow is still opt-in for older pages.

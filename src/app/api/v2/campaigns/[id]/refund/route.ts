@@ -19,6 +19,7 @@ import * as schema from '@/lib/db/schemas';
 import { getSession } from '@/lib/auth/session';
 import { executePayout } from '@/lib/solana/escrow';
 import { clientKey, rateLimit } from '@/lib/ratelimit';
+import { guardWrites } from '@/lib/kill-switch';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +31,8 @@ export async function POST(
   req: Request,
   { params }: { params: { id: string } },
 ) {
+  const blocked = guardWrites();
+  if (blocked) return blocked;
   const { allowed } = rateLimit(clientKey(req, 'campaign:refund'), {
     limit: 5,
     windowMs: 60_000,
