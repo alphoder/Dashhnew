@@ -174,7 +174,7 @@ Academic project supervision: **Ms. Ritambhara Patidar** and
 ## Contact
 
 - Name: **Vedant Singh**
-- Email: `<<your-email@example.com>>`
+- Email: `vedant1609singh@gmail.com`
 - Twitter: `@dashhhee`
 - GitHub: <https://github.com/alphoder/Dashhnew>
 - Live demo: <https://dashhnew.vercel.app>

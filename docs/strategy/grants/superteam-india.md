@@ -111,10 +111,8 @@ Each milestone closed with a public Twitter thread + screen-recording.
 ## Contact
 
 - Name: **Vedant Singh**
-- Email: `<<your-email@example.com>>`
+- Email: `vedant1609singh@gmail.com`
 - Twitter: `@dashhhee`
-- Discord: `<<discord-handle>>`
-- Telegram: `<<@telegramhandle>>`
 - Solana wallet (USDC receive): `7ZyHfVPKqQN67LtQ6Drr1WhLfpYwbmAzQ5v8xpsAvqve`
 
 ---

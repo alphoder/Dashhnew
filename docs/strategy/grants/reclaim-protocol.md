@@ -148,7 +148,7 @@ Total scope: 8–10 weeks of focused solo work post-graduation (June 2026 onward
 ## 12. Contact
 
 - Name: **Vedant Singh**
-- Email: `<<your-email@example.com>>`
+- Email: `vedant1609singh@gmail.com`
 - Twitter: `@dashhhee`
 - GitHub: alphoder/Dashhnew
 - Live demo: <https://dashhnew.vercel.app>
