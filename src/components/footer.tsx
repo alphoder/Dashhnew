@@ -70,7 +70,7 @@ export default function Footer() {
                 Get started
               </Link>
               <Link href="/terms" className="text-zinc-300 hover:text-white transition-colors">
-                Terms
+                Campaign terms
               </Link>
               <Link href="/terms#ban" className="text-zinc-300 hover:text-white transition-colors">
                 Ban policy
@@ -78,6 +78,32 @@ export default function Footer() {
             </nav>
           </div>
         </div>
+
+        {/* Legal row — a thin band of policy links beneath the column grid.
+            Kept separate so it never competes for attention with the main
+            product navigation above. */}
+        <nav className="mb-4 mt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-white/5 pt-6 text-xs text-zinc-500">
+          <Link
+            href="/legal/privacy"
+            className="hover:text-white transition-colors"
+          >
+            Privacy
+          </Link>
+          <span className="text-zinc-700">·</span>
+          <Link
+            href="/legal/terms"
+            className="hover:text-white transition-colors"
+          >
+            Terms of Service
+          </Link>
+          <span className="text-zinc-700">·</span>
+          <Link
+            href="/legal/cookies"
+            className="hover:text-white transition-colors"
+          >
+            Cookies
+          </Link>
+        </nav>
 
         {/* Copyright + socials */}
         <div className="flex flex-col-reverse gap-6 md:flex-row md:items-center md:justify-between pt-8 border-t border-white/10">

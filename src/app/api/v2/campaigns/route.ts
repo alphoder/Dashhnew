@@ -4,8 +4,9 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from '@/lib/db/schemas';
 import { createCampaignSchema } from '@/lib/validation/campaign';
-import { clientKey, rateLimit } from '@/lib/ratelimit';
+import { LIMITS, rateLimitBoth } from '@/lib/ratelimit';
 import { getSession } from '@/lib/auth/session';
+import { getClientIp, verifyTurnstile } from '@/lib/captcha';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,12 +44,6 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const { allowed } = rateLimit(clientKey(req, 'campaigns:create'), {
-    limit: 10,
-    windowMs: 60_000,
-  });
-  if (!allowed) return new NextResponse('Too Many Requests', { status: 429 });
-
   try {
     // Session guard — prefer SIWS session, fall back to body-provided wallet
     // while the SIWS flow is still opt-in for older pages.
@@ -57,6 +52,39 @@ export async function POST(req: Request) {
     const brandWallet: string | undefined = session?.wallet ?? body.brandWallet;
     if (!brandWallet) {
       return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
+    }
+
+    // Tighter rate-limit: per-wallet AND per-IP, both must allow.
+    // This stops a single wallet from creating 1000s of campaigns even if
+    // it rotates IPs, and stops a single bot from creating campaigns under
+    // many wallets from one machine.
+    const rl = rateLimitBoth(
+      req,
+      'campaigns:create',
+      brandWallet,
+      LIMITS.CAMPAIGN_CREATE,
+    );
+    if (!rl.allowed) {
+      return NextResponse.json(
+        {
+          error:
+            'too many campaigns this hour. Please wait before creating another.',
+          resetAt: rl.resetAt,
+        },
+        { status: 429 },
+      );
+    }
+
+    // Optional CAPTCHA — only enforced if TURNSTILE_SECRET is set.
+    // Field name `captchaToken` matches Cloudflare's default React widget.
+    const captcha = await verifyTurnstile(body?.captchaToken ?? null, {
+      remoteIp: getClientIp(req),
+    });
+    if (!captcha.ok) {
+      return NextResponse.json(
+        { error: 'captcha verification failed', reason: captcha.reason },
+        { status: 403 },
+      );
     }
 
     const parsed = createCampaignSchema.safeParse(body);

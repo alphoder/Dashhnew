@@ -3,7 +3,7 @@ import { eq, and } from 'drizzle-orm';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from '@/lib/db/schemas';
-import { clientKey, rateLimit } from '@/lib/ratelimit';
+import { LIMITS, rateLimitBoth } from '@/lib/ratelimit';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -20,17 +20,27 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const { allowed } = rateLimit(clientKey(req, 'participate'), {
-    limit: 20,
-    windowMs: 60_000,
-  });
-  if (!allowed) return new NextResponse('Too Many Requests', { status: 429 });
-
   try {
     const body = await req.json();
     const parsed = bodySchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    }
+
+    // Per-wallet + per-IP rate limit. A single wallet can join at most 20
+    // campaigns per hour — way more than legitimate usage but tight enough
+    // to thwart enumeration scripts.
+    const rl = rateLimitBoth(
+      req,
+      'participate',
+      parsed.data.creatorWallet,
+      LIMITS.PARTICIPATE,
+    );
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'too many joins this hour', resetAt: rl.resetAt },
+        { status: 429 },
+      );
     }
 
     const db = getDb();

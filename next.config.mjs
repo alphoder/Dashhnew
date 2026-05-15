@@ -1,3 +1,5 @@
+import { withSentryConfig } from '@sentry/nextjs';
+
 /** @type {import('next').NextConfig} */
 const nextConfig =
 {
@@ -30,4 +32,23 @@ const nextConfig =
     compress: true,
 }
 
-export default nextConfig;
+// Wrap with Sentry's config so source maps upload + tracing instrumentation
+// is applied. Sentry init only fires when NEXT_PUBLIC_SENTRY_DSN is set,
+// so unconfigured environments behave exactly like before this wrapper.
+export default withSentryConfig(nextConfig, {
+  // Silent unless an upload fails — avoids noisy build logs.
+  silent: true,
+  // Org/project come from env so we don't hardcode tenant info.
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  // Upload source maps only when SENTRY_AUTH_TOKEN is set
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  // Tunnel through our own route to defeat ad-blockers stripping requests
+  // to sentry.io. Disabled by default — set NEXT_PUBLIC_SENTRY_TUNNEL=true
+  // to turn on.
+  tunnelRoute: process.env.NEXT_PUBLIC_SENTRY_TUNNEL === 'true'
+    ? '/monitoring'
+    : undefined,
+  hideSourceMaps: true,
+  disableLogger: true,
+});

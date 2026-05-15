@@ -4,7 +4,7 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from '@/lib/db/schemas';
 import { z } from 'zod';
-import { clientKey, rateLimit } from '@/lib/ratelimit';
+import { LIMITS, rateLimitBoth } from '@/lib/ratelimit';
 import { getAdapter } from '@/lib/reclaim';
 import { verify } from '@/lib/reclaim/verify';
 import { anchorProofToArweave } from '@/lib/arweave';
@@ -80,17 +80,23 @@ async function recordDisqualification(
 }
 
 export async function POST(req: Request) {
-  const { allowed } = rateLimit(clientKey(req, 'proofs'), {
-    limit: 20,
-    windowMs: 60_000,
-  });
-  if (!allowed) return new NextResponse('Too Many Requests', { status: 429 });
-
   try {
     const body = await req.json();
     const parsed = submitSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    }
+
+    // We don't know the wallet yet — it's derived from the participation
+    // record below. So apply the IP-based check eagerly, then refine to
+    // wallet-based once we look up the participation. Acceptable trade-off
+    // because the per-wallet cap there is hourly.
+    const ipRl = rateLimitBoth(req, 'proofs', null, LIMITS.PROOF_SUBMIT);
+    if (!ipRl.allowed) {
+      return NextResponse.json(
+        { error: 'too many proof submissions this hour', resetAt: ipRl.resetAt },
+        { status: 429 },
+      );
     }
 
     const db = getDb();

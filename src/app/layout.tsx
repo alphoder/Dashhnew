@@ -4,6 +4,9 @@ import Header from "@/components/header";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DemoBanner } from "@/components/demo-banner";
+import { CookieBanner } from "@/components/cookie-banner";
+import { PostHogPageView } from "@/components/posthog-pageview";
+import { Suspense } from "react";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL || "https://dashhnew.vercel.app";
@@ -93,7 +96,13 @@ export default function RootLayout({
         </div>
         <DemoBanner />
         <Header /><ToastContainer />
+        {/* PostHog navigation tracker — fires on every route change.
+            Wrapped in Suspense because useSearchParams suspends. */}
+        <Suspense fallback={null}>
+          <PostHogPageView />
+        </Suspense>
         {children}
+        <CookieBanner />
       </body>
     </html>
   );
