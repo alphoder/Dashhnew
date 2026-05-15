@@ -103,6 +103,15 @@ export default function Footer() {
             vedant1609singh@gmail.com
           </a>
           <span className="text-zinc-700">·</span>
+          <a
+            href="https://x.com/dashhhee"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition-colors"
+          >
+            @dashhhee
+          </a>
+          <span className="text-zinc-700">·</span>
           <Link
             href="/legal/privacy"
             className="hover:text-white transition-colors"
@@ -137,7 +146,7 @@ export default function Footer() {
           </div>
           <div className="flex gap-3">
             <Link
-              href="https://twitter.com/"
+              href="https://x.com/dashhhee"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="X / Twitter"
