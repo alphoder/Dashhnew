@@ -36,3 +36,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Internal planning docs (kept locally, off GitHub)
+/docs/
+/.claude/
