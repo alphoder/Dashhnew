@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Copy, LogOut, Check } from 'lucide-react';
+import { isDemoMode } from '@/lib/demo-mode';
 
 interface ConnectPhantomWalletProps {
   walletAddress: string | null;
@@ -51,6 +52,10 @@ export default function ConnectPhantomWallet({
   useEffect(() => {
     setIsClient(true);
     if (typeof window === 'undefined') return;
+
+    // Skip silent reconnect check if in demo mode to prevent
+    // Phantom extension from clearing the fake demo wallet.
+    if (isDemoMode()) return;
 
     const { solana } = window as any;
 

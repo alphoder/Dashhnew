@@ -19,8 +19,9 @@ const C2 = "CrEaToR2qKwQFkNpRzTJVTnMjPxYcQvxFyXmKqpHtTc";
 const C3 = "CrEaToR3qKwQFkNpRzTJVTnMjPxYcQvxFyXmKqpHtTc";
 const C4 = "CrEaToR4qKwQFkNpRzTJVTnMjPxYcQvxFyXmKqpHtTc";
 const C5 = "CrEaToR5qKwQFkNpRzTJVTnMjPxYcQvxFyXmKqpHtTc";
+const DEMO_WALLET = "DemoWalletDASHHxxxxxxxxxxxxxxxxxxxxxxxxxAAAA";
 
-const CREATORS = [C1, C2, C3, C4, C5];
+const CREATORS = [C1, C2, C3, C4, C5, DEMO_WALLET];
 
 const IMG = {
   coffee: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800",
@@ -35,7 +36,7 @@ const IMG = {
 
 // ─────────── 1. Clear existing rows ───────────
 console.log("🧹 Clearing existing rows…");
-const clearOrder = [
+const tables = [
   "payouts_v2",
   "proofs_v2",
   "notifications_v2",
@@ -45,9 +46,16 @@ const clearOrder = [
   "users",
   "creators",
 ];
-for (const t of clearOrder) {
+for (const t of tables) {
   try {
-    await sql(`DELETE FROM ${t}`);
+    if (t === "payouts_v2") await sql`DELETE FROM payouts_v2`;
+    else if (t === "proofs_v2") await sql`DELETE FROM proofs_v2`;
+    else if (t === "notifications_v2") await sql`DELETE FROM notifications_v2`;
+    else if (t === "participations_v2") await sql`DELETE FROM participations_v2`;
+    else if (t === "campaigns_v2") await sql`DELETE FROM campaigns_v2`;
+    else if (t === "profiles_v2") await sql`DELETE FROM profiles_v2`;
+    else if (t === "users") await sql`DELETE FROM users`;
+    else if (t === "creators") await sql`DELETE FROM creators`;
   } catch (err) {
     console.log(`  (skipping ${t}: ${err.message.slice(0, 60)})`);
   }
@@ -183,6 +191,7 @@ const profileRows = [
   { wallet: C3, role: "creator", displayName: "Lena Park", tiktok: "lena.park" },
   { wallet: C4, role: "creator", displayName: "Carlos Silva", twitter: "csilva" },
   { wallet: C5, role: "creator", displayName: "Mia Chen", instagram: "miachen" },
+  { wallet: DEMO_WALLET, role: "creator", displayName: "Alex (Demo)", instagram: "alex_demo", twitter: "alex_demo_x" },
 ];
 for (const p of profileRows) {
   await sql`
@@ -296,6 +305,9 @@ const notifs = [
   { wallet: C3, kind: "proof_rejected", title: "Proof rejected", body: "Couldn't parse engagement. Try re-verifying." },
   { wallet: C4, kind: "payout_sent", title: "Payout sent", body: "1.85 SOL for Gamer Energy IG Reel" },
   { wallet: C5, kind: "proof_verified", title: "Proof verified", body: "4,891 views on Autumn Latte IG Drop" },
+  { wallet: DEMO_WALLET, kind: "proof_verified", title: "Proof verified", body: "8,941 views verified on Autumn Latte IG Drop. Payout: 4.47 SOL" },
+  { wallet: DEMO_WALLET, kind: "payout_sent", title: "Payout sent", body: "4.47 SOL landed in your wallet" },
+  { wallet: DEMO_WALLET, kind: "participation_joined", title: "Campaign joined", body: "You joined YouTube Shorts Sneaker Unbox" },
   { wallet: BRAND, kind: "participation_joined", title: "New creator joined", body: "Ava Kim joined Autumn Latte IG Drop" },
   { wallet: BRAND, kind: "participation_joined", title: "New creator joined", body: "Ravi Mehta joined YouTube Shorts Sneaker Unbox" },
   { wallet: BRAND, kind: "proof_verified", title: "Engagement verified", body: "11,204 verified views on Phantom Onboarding Thread" },
